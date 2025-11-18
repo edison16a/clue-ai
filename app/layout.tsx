@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Clue.ai",
+  title: "Clue-ai",
   description:
     "An AI Agent that helps students fix code and figure out labs without directly giving the answer.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
