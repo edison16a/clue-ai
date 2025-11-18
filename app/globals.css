@@ -88,8 +88,6 @@ body.root {
   color: transparent;
 }
 
-
-
 .tagline {
   max-width: 740px;
   margin: 12px auto 20px;
@@ -183,7 +181,7 @@ body.root {
   border-radius: var(--radius-md);
   padding: 14px 12px;
   background: rgba(0,0,0,.2);
-  color: rgb(var(--muted));
+  color: rgb(var(--fg));  
   cursor: pointer;
   transition: border-color .15s ease, background .2s ease, transform .08s ease;
   user-select: none;
@@ -320,7 +318,6 @@ body.root {
   padding: 0;
 }
 
-
 .placeholder {
   color: rgb(var(--muted));
   font-size: 14.5px;
@@ -455,12 +452,15 @@ body.root {
 /* center contents when file exists */
 .dzInner {
   display: flex;
-  gap: 10px;
-  align-items: center;       /* vertical centering */
-  justify-content: flex-start;
+  flex-direction: row;    /* icon above text */
+  gap: 8px;
+  align-items: center;       /* horizontal centering */
+  justify-content: center;   /* vertical centering */
+  text-align: center;        /* center text lines */
   width: 100%;
   height: 100%;
 }
+
 .dropzone.hasFile .dzInner {
   justify-content: center;   /* horizontal centering (uploaded state) */
   align-items: center;        /* vertical centering */
@@ -613,7 +613,6 @@ body.root {
   .loaderBar, .loaderBar::after { animation-duration: 3.4s; }
 }
 
-
 /* === Custom scrollbar for the code input === */
 .codebox::-webkit-scrollbar {
   width: 10px;                  /* thickness of vertical scrollbar */
@@ -638,5 +637,579 @@ body.root {
 /* Firefox support */
 .codebox {
   scrollbar-width: thin; /* auto | thin | none */
-  scrollbar-color: rgba(144,97,255,.7) rgba(255,255,255,0.05);
+  scrollbar-color: rgba(185, 184, 189, 0.7) rgba(255,255,255,0.05);
 }
+
+/* === Subject mode toggle bar === */
+.modeBar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  justify-content: center;
+}
+
+.modeChip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;                 /* bigger button */
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.18);   /* neutral base, gradient will be on ::before */
+  color: rgb(var(--fg));
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.3;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+  text-align: left;
+  overflow: hidden;                  /* clip gradient nicely to the pill */
+}
+
+.modeChip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(144, 97, 255, 0.6);
+  box-shadow: 0 10px 22px rgba(144, 97, 255, 0.22);
+}
+
+.modeChip.isActive {
+  /*
+  background: linear-gradient(
+    90deg,
+    rgba(144, 97, 255, 1) 0%,
+    rgba(30, 200, 180, 1) 100%
+  );
+  */
+  background: rgba(144,97,255,.18);
+  color: white;
+  border-color: rgba(144, 97, 255, 0.6);
+}
+
+.modeChip.isActive .modeHint {
+  opacity: 0.9;
+}
+
+.modeIcon {
+  width: 24px;   /* slightly larger icon circle */
+  height: 24px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5); /* default for active; overridden below */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+/* ⬇️ Make the icon bubble pop more when the chip is NOT selected */
+.modeChip:not(.isActive) .modeIcon {
+  background: rgba(0, 0, 0, 0.5); /* default for active; overridden below */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+.modeIcon svg {
+  display: block;
+}
+
+.modeLabelText {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.modeHint {
+  font-size: 11px;
+  color: rgb(var(--muted));
+  opacity: 0.75;
+}
+
+.modeChip.isActive .modeHint {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 640px) {
+  .modeBar {
+    justify-content: center;
+  }
+}
+
+/* === History / Past sessions section === */
+.history {
+  max-width: 1200px;
+  margin: 26px auto 0;
+  padding: 0 20px 8px;
+}
+.historyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.historyHeader h2 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--muted));
+}
+
+.historyHeader p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: rgba(var(--muted), 0.95);
+}
+
+/* NEW: wrap text so it can flex next to the button */
+.historyHeaderText {
+  flex: 1;
+  min-width: 0;
+}
+
+.clearHistoryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgb(var(--fg));
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.clearHistoryBtn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(144, 97, 255, 0.55);
+  background: rgba(144, 97, 255, 0.16);
+  box-shadow: 0 10px 22px rgba(144, 97, 255, 0.22);
+}
+
+.clearHistoryBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.clearHistoryBtn:disabled {
+  opacity: 0.65;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.clearHistoryIcon {
+  display: grid;
+  place-items: center;
+}
+
+
+.historyList {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Use <details> as collapsible cards */
+.historyItem {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(var(--card), 0.96), rgba(var(--card-2), 0.96));
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.historyItem[open] {
+  border-color: rgba(144, 97, 255, 0.6);
+}
+
+.historySummary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.historySummary::-webkit-details-marker {
+  display: none;
+}
+
+.historySummaryMain {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.historyModeTag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* subtle color variations per mode */
+.mode-cs {
+  background: rgba(144, 97, 255, 0.18);
+  border-color: rgba(144, 97, 255, 0.6);
+}
+.mode-math {
+  background: rgba(30, 200, 180, 0.18);
+  border-color: rgba(30, 200, 180, 0.6);
+}
+.mode-science {
+  background: rgba(255, 180, 60, 0.18);
+  border-color: rgba(255, 180, 60, 0.6);
+}
+.mode-english {
+  background: rgba(255, 105, 180, 0.18);
+  border-color: rgba(255, 105, 180, 0.6);
+}
+.mode-other {
+  background: rgba(120, 130, 150, 0.2);
+  border-color: rgba(120, 130, 150, 0.7);
+}
+
+.historyAskText {
+  font-size: 13px;
+  color: rgb(var(--fg));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.historyTimestamp {
+  font-size: 11px;
+  color: rgb(var(--muted));
+  white-space: nowrap;
+}
+
+.historyBody {
+  padding: 10px 14px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 12px;
+}
+
+@media (max-width: 800px) {
+  .historyBody {
+    grid-template-columns: 1fr;
+  }
+}
+
+.historyMeta {
+  font-size: 13px;
+  color: rgb(var(--muted));
+}
+
+.historyMeta p {
+  margin: 0 0 6px;
+}
+
+.historyCode {
+  margin-top: 6px;
+}
+
+.historyCode pre {
+  margin-top: 4px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.24);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.historyImages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.historyImages img {
+  width: 110px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.historyResponse h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgb(var(--muted));
+  margin: 0 0 4px;
+}
+
+.historyResponseText {
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* reuse markdown styling but tighten spacing */
+.historyResponseText p {
+  margin: 0.4em 0;
+}
+.historyResponseText ul,
+.historyResponseText ol {
+  margin: 0.4em 0 0.4em 1.25em;
+}
+.historyResponseText pre {
+  margin: 0.5em 0;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.24);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: auto;
+}
+
+/* === Manual theme overrides (dark / light) === */
+/* These override the earlier :root + @media rules when .theme-dark / .theme-light is present on <html> */
+
+:root.theme-dark {
+  /* Same as your original dark theme values */
+  --bg: 12 14 18;            /* #0C0E12 */
+  --fg: 233 237 243;
+  --muted: 160 167 184;
+  --accent: 144 97 255;      /* purple-ish */
+  --accent-2: 30 200 180;    /* teal pop */
+  --card: 18 20 26;
+  --card-2: 22 24 32;
+  --ring: 144 97 255 / 55%;
+  --shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+
+/* Light mode: gold + light gray / white */
+:root.theme-light {
+  --bg: 245 246 250;          /* very light gray */
+  --fg: 18 24 38;             /* deep ink */
+  --muted: 110 120 140;
+  --accent: 234 179 8;        /* warm gold */
+  --accent-2: 252 211 77;     /* soft golden accent */
+  --card: 255 255 255;        /* white cards */
+  --card-2: 248 249 252;      /* light panel */
+  --ring: 234 179 8 / 55%;
+  --shadow: 0 10px 26px rgba(15, 23, 42, 0.14);
+}
+
+/* === Theme picker bar === */
+.themeBar {
+  display: inline-flex;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+:root.theme-light .themeBar {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.themeToggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgb(var(--fg));
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.2;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.08s ease,
+    color 0.18s ease;
+}
+
+.themeToggle:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root.theme-light .themeToggle:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.themeToggle.isActive {
+  background: radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.18), transparent 55%),
+              linear-gradient(90deg, rgba(var(--accent), 0.95), rgba(var(--accent-2), 0.95));
+  border-color: rgba(255, 255, 255, 0.9);
+  color: #111827;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+:root.theme-light .themeToggle.isActive {
+  color: #111827;
+}
+
+.themeIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: rgb(var(--fg));
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+:root.theme-light .themeIcon {
+  background: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.themeToggle.isActive .themeIcon {
+  background: rgba(255, 255, 255, 0.92);
+  color: #b45309; /* warm brown/gold for icon line */
+}
+
+.themeLabelText {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Make sure the hero stack still centers nicely on mobile */
+@media (max-width: 640px) {
+  .themeBar {
+    justify-content: center;
+  }
+}
+
+/* === New Prompt button: styled like Help button but secondary === */
+.newPromptBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.16);
+  color: rgb(var(--fg));
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.15px;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+
+  /* 🔥 key changes */
+  order: 4;                 /* still after help button */
+  grid-column: 1 / -1;      /* span full width of the grid */
+  width: 100%;              /* make it really wide */
+  margin-top: 8px;
+}
+
+
+
+.newPromptBtn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(144, 97, 255, 0.55);
+  background: rgba(144, 97, 255, 0.16);
+  box-shadow: 0 10px 22px rgba(144, 97, 255, 0.22);
+}
+
+.newPromptBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.newPromptBtn:disabled {
+  opacity: 0.65;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+/* mobile: full-width stack under Help button */
+@media (max-width: 640px) {
+  .newPromptBtn {
+    width: 100%;
+    justify-content: center;
+    grid-column: 1 / -1;
+    margin-top: 6px;
+  }
+}
+
+.newPromptIcon {
+  display: grid;
+  place-items: center;
+}
+
+/* Make dropzone text match button typography */
+.dropzone .dzText,
+.dropzone .dzTextUploaded {
+  font-size: 13px;               /* same as .helpBtn / .newPromptBtn */
+  font-weight: 600;              /* or 700 if you want it bolder */
+  letter-spacing: 0.2px;         /* same subtle tracking as buttons */
+}
+
+.dropzone .fileNote {
+  font-size: 12px;               /* keep this slightly smaller if you like */
+  font-weight: 500;
+}
+
+/* bars */
+/* === Global themed scrollbars (applies everywhere) === */
+
+/* Chrome / Edge / Safari */
+*::-webkit-scrollbar {
+  width: 10px;                  /* vertical scrollbar thickness */
+  height: 10px;                 /* horizontal scrollbar thickness */
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(185, 184, 189, 0.7) rgba(255,255,255,0.05);
+}
+
