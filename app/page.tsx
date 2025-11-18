@@ -1,19 +1,158 @@
 // app/page.tsx
 "use client";
 
-import { useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";    
-import remarkGfm from "remark-gfm";      
+import { useRef, useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+// NEW: subject mode type + config
+type SubjectMode = "cs" | "math" | "science" | "english" | "other";
+
+// NEW: theme mode type
+type ThemeMode = "dark" | "light";
+
+const SUBJECT_MODES: { id: SubjectMode; label: string; hint: string }[] = [
+  { id: "cs", label: "Computer Science", hint: "" },
+  { id: "math", label: "Math", hint: "" },
+  { id: "science", label: "Science", hint: "" },
+  { id: "english", label: "English", hint: "" },
+  { id: "other", label: "Other", hint: "" },
+];
+
+type HistoryItem = {
+  id: number;
+  timestamp: string;
+  mode: SubjectMode;
+  ask: string;
+  code: string;
+  images: Array<{ name: string; src: string }>;
+  aiText: string;
+};
 
 export default function Page() {
   const [code, setCode] = useState<string>("");
-  const [imageName, setImageName] = useState<string>("");                // kept
+  const [imageName, setImageName] = useState<string>(""); // kept
   const [imagePreview, setImagePreview] = useState<string | null>(null); // kept (legacy single)
   const [aiText, setAiText] = useState<string>("");
-  const [ask, setAsk] = useState<string>("");                            // NEW: optional prompt text
+  const [ask, setAsk] = useState<string>(""); // NEW: optional prompt text
   const [images, setImages] = useState<Array<{ name: string; src: string }>>([]); // NEW: multi
-  const [isLoading, setIsLoading] = useState<boolean>(false);            // NEW: loading bar state
+  const [isLoading, setIsLoading] = useState<boolean>(false); // NEW: loading bar state
+  const [subjectMode, setSubjectMode] = useState<SubjectMode>("cs"); // NEW: subject mode
+  const [history, setHistory] = useState<HistoryItem[]>([]); // NEW: past prompts / responses
+
+  // NEW: theme state
+  const [theme, setTheme] = useState<ThemeMode>("dark");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return; // safety for SSR
+
+    try {
+      const raw = window.localStorage.getItem("clueai-history-v1");
+      if (raw) {
+        const parsed = JSON.parse(raw) as HistoryItem[];
+        setHistory(parsed);
+      }
+    } catch (err) {
+      console.error("Failed to load history from localStorage:", err);
+    }
+  }, []);
+
+  // Persist history to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      // NOTE: This will store images (base64) too — if you hit size limits later,
+      // you can strip images here before saving.
+      window.localStorage.setItem("clueai-history-v1", JSON.stringify(history));
+    } catch (err) {
+      console.error("Failed to save history to localStorage:", err);
+    }
+  }, [history]);
+
+  // NEW: load initial theme from localStorage / system preference
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const stored = window.localStorage.getItem("clueai-theme");
+      if (stored === "light" || stored === "dark") {
+        setTheme(stored);
+        return;
+      }
+
+      const prefersLight = window.matchMedia?.("(prefers-color-scheme: light)").matches;
+      setTheme(prefersLight ? "light" : "dark");
+    } catch {
+      // fall back to default "dark"
+    }
+  }, []);
+
+  // NEW: apply theme to <html> and persist
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const root = document.documentElement;
+    root.classList.toggle("theme-light", theme === "light");
+    root.classList.toggle("theme-dark", theme === "dark");
+
+    try {
+      window.localStorage.setItem("clueai-theme", theme);
+    } catch {
+      // ignore
+    }
+  }, [theme]);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Derived text based on subject mode (labels / placeholders)
+  const codeLabel =
+    subjectMode === "cs"
+      ? "Paste your code"
+      : subjectMode === "math"
+      ? "Paste your math problem"
+      : subjectMode === "science"
+      ? "Paste your science question or lab instructions"
+      : subjectMode === "english"
+      ? "Paste the passage, prompt, or outline"
+      : "Paste your assignment details";
+
+  const codePlaceholder =
+    subjectMode === "cs"
+      ? `// Paste your Java, Python, JS, etc.\n// Attach pictures if needed.`
+      : subjectMode === "math"
+      ? `// Paste the full math problem or system here.\n// You can also attach a screenshot of the question.`
+      : subjectMode === "science"
+      ? `// Paste the question, lab write-up, or data snippet.\n// Attach images of diagrams or lab setups if helpful.`
+      : subjectMode === "english"
+      ? `// Paste the prompt, passage, or outline you're working on.\n// Attach screenshots of the rubric or prompt if needed.`
+      : `// Paste any instructions or content you're stuck on.\n// Attach screenshots or images if they help explain the task.`;
+
+  const uploadAriaLabel =
+    subjectMode === "cs"
+      ? "Upload image of your assignment or error"
+      : subjectMode === "math"
+      ? "Upload image of your math problem or work"
+      : subjectMode === "science"
+      ? "Upload image of your diagram, data table, or lab prompt"
+      : subjectMode === "english"
+      ? "Upload image of your prompt, passage, or rubric"
+      : "Upload image related to your assignment";
+
+  const modeReadable = (mode: SubjectMode): string => {
+    switch (mode) {
+      case "cs":
+        return "CS";
+      case "math":
+        return "Math";
+      case "science":
+        return "Science";
+      case "english":
+        return "English";
+      default:
+        return "Other";
+    }
+  };
 
   // NEW: util to add multiple files
   const addFiles = (files: FileList | null) => {
@@ -66,40 +205,154 @@ export default function Page() {
     });
   };
 
-  // REMOVED: onStart (no longer used)
-
   // UPDATED: Help button -> start loading bar (no fake text)
   const onHelp = async () => {
-  try {
-    setAiText("");
-    setIsLoading(true);
+    try {
+      setAiText("");
+      setIsLoading(true);
 
-    const res = await fetch("/api/help", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, ask, images }),
-    });
+      const res = await fetch("/api/help", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, ask, images, subjectMode }), // NEW: send subjectMode too
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Request failed");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
 
-    setAiText((data.aiText ?? "").trimStart());
-  } catch (e: any) {
-    setAiText(`Oops — ${e.message || "something went wrong."}`);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      const cleanText = (data.aiText ?? "").trimStart();
+      setAiText(cleanText);
+
+      // NEW: push to history (snapshot of current interaction) with max 10 items
+      setHistory((prev) => {
+        const next: HistoryItem[] = [
+          {
+            id: Date.now(),
+            timestamp: new Date().toLocaleString(),
+            mode: subjectMode,
+            ask,
+            code,
+            images: images.map((img) => ({ ...img })), // snapshot
+            aiText: cleanText,
+          },
+          ...prev,
+        ];
+        return next.slice(0, 10); // cap at 10 items
+      });
+    } catch (e: any) {
+      const errMsg = `Oops — ${e?.message || "something went wrong."}`;
+      setAiText(errMsg);
+
+      // also log failures in history so user can see what happened (also capped at 10)
+      setHistory((prev) => {
+        const next: HistoryItem[] = [
+          {
+            id: Date.now(),
+            timestamp: new Date().toLocaleString(),
+            mode: subjectMode,
+            ask,
+            code,
+            images: images.map((img) => ({ ...img })),
+            aiText: errMsg,
+          },
+          ...prev,
+        ];
+        return next.slice(0, 10); // cap at 10 items
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // END UPDATED
+
+  // NEW: clear current prompt / response / inputs
+  const onNewPrompt = () => {
+    setCode("");
+    setAsk("");
+    setImages([]);
+    setImageName("");
+    setImagePreview(null);
+    setAiText("");
+    setIsLoading(false);
+  };
+
+    // NEW: clear saved history (state + localStorage)
+  const onClearHistory = () => {
+    setHistory([]);
+
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem("clueai-history-v1");
+      } catch {
+        // ignore
+      }
+    }
+  };
+
 
   return (
     <main className="container">
       <header className="hero">
-        <h1 className="brand">Clue.ai</h1>
+        <h1 className="brand">Clue-ai</h1>
         <p className="tagline">
-          An AI Agent that helps students troubleshoot code or coding labs—without
+          An AI Agent that helps students troubleshoot assignments without
           directly giving the answer.
         </p>
+
+        {/* NEW: subject-mode toggle bar */}
+        <div className="modeBar" aria-label="Choose subject mode">
+          {SUBJECT_MODES.map((mode) => {
+            const active = subjectMode === mode.id;
+            return (
+              <button
+                key={mode.id}
+                type="button"
+                className={`modeChip ${active ? "isActive" : ""}`}
+                onClick={() => setSubjectMode(mode.id)}
+                aria-pressed={active}
+              >
+                {/* CS icon only for CS mode, per request */}
+                {mode.id === "cs" && (
+                  <span className="modeIcon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                      <path
+                        d="M8.5 6.5L4 12l4.5 5.5M15.5 6.5L20 12l-4.5 5.5M11 18h2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                )}
+                {/* NEW: icons for other subjects */}
+                {mode.id === "math" && (
+                  <span className="modeIcon" aria-hidden="true">
+                    ∆
+                  </span>
+                )}
+                {mode.id === "science" && (
+                  <span className="modeIcon" aria-hidden="true">
+                    🧪
+                  </span>
+                )}
+                {mode.id === "english" && (
+                  <span className="modeIcon" aria-hidden="true">
+                    📖
+                  </span>
+                )}
+                {mode.id === "other" && (
+                  <span className="modeIcon" aria-hidden="true">
+                    ❔
+                  </span>
+                )}
+                <span className="modeLabelText">{mode.label}</span>
+                <span className="modeHint">{mode.hint}</span>
+              </button>
+            );
+          })}
+        </div>
         {/* REMOVED Start button */}
       </header>
 
@@ -107,12 +360,12 @@ export default function Page() {
         <div className="left">
           <div className="fieldGroup">
             <label htmlFor="code" className="label">
-              Paste your code
+              {codeLabel}
             </label>
             <textarea
               id="code"
               className="codebox"
-              placeholder={`// Paste your Java, Python, JS, etc.\n// Attach pictures if needed.`}
+              placeholder={codePlaceholder}
               spellCheck={false}
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -122,7 +375,7 @@ export default function Page() {
           {/* NEW: Optional guidance input */}
           <div className="fieldGroup">
             <label htmlFor="ask" className="label">
-              How can I help you (Optional)
+              What do you need help with?
             </label>
             <input
               id="ask"
@@ -147,11 +400,11 @@ export default function Page() {
               <input
                 ref={fileInputRef}
                 type="file"
-                multiple                                          // NEW
+                multiple // NEW
                 accept="image/*"
                 className="hiddenFile"
                 onChange={onFileChange}
-                aria-label="Upload image of your assignment or error"
+                aria-label={uploadAriaLabel}
               />
               <div className="dzInner">
                 <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
@@ -165,7 +418,7 @@ export default function Page() {
                   />
                 </svg>
                 <span className="dzText">Drag & drop or click to upload images</span>
-                {imageName && <span className="dzTextUploaded">File uploaded</span>}
+                {imageName && <span className="dzTextUploaded">Upload More</span>}
                 {imageName && <em className="fileNote">Selected: {imageName}</em>}
               </div>
             </label>
@@ -212,7 +465,30 @@ export default function Page() {
                   strokeLinejoin="round"
                 />
               </svg>
-              <span>{isLoading ? "Thinking…" : "Help Debug"}</span>
+              <span>{isLoading ? "Thinking…" : "Provide Guidance"}</span>
+            </button>
+
+            {/* NEW: New Prompt button to clear current inputs/response */}
+            <button
+              type="button"
+              className="newPromptBtn"
+              onClick={onNewPrompt}
+              title="Clear current question and start fresh"
+              disabled={isLoading}
+            >
+               <span className="newPromptIcon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24">
+                  <path
+                    d="M6 6l12 12M18 6L6 18"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              <span>Clear Existing Prompt &amp; Response</span>
             </button>
 
             {/* legacy single preview block (kept). Hidden via CSS when gallery present */}
@@ -248,13 +524,14 @@ export default function Page() {
             ) : (
               <div className="placeholder">
                 <p>
-                  Press <strong>Help Debug</strong> to start. I’ll analyze your code, images, and
-                  context and return coaching-only steps (no spoilers).
+                  Press <strong>Provide Guidance</strong> to start. I’ll analyze your{" "}
+                  {modeReadable(subjectMode).toLowerCase()} work, images, and context and return
+                  coaching-only steps (no spoilers).
                 </p>
                 <ul>
-                  <li>Upload a screenshot of your prompt/error</li>
-                  <li>Paste a minimal code snippet</li>
-                  <li>Describe what you expected vs. what happened</li>
+                  <li>Upload a screenshots of the assignment</li>
+                  <li>Paste details or assignment instructions</li>
+                  <li>Describe what you need help with</li>
                 </ul>
               </div>
             )}
@@ -262,9 +539,98 @@ export default function Page() {
         </div>
       </section>
 
+      {/* NEW: Past prompts / history section */}
+      {history.length > 0 && (
+        <section className="history">
+    <div className="historyHeader">
+      <div className="historyHeaderText">
+        <h2>Past Questions</h2>
+        <p>
+          Review the past 10 questions you had, what you uploaded, and how Clue-ai responded. Click on the box to see more details.
+        </p>
+      </div>
+
+      {/* NEW: Clear History button */}
+      <button
+        type="button"
+        className="clearHistoryBtn"
+        onClick={onClearHistory}
+        title="Clear saved history"
+      >
+        <span className="clearHistoryIcon" aria-hidden="true">
+          {/* same X icon as Clear Prompt */}
+          <svg width="16" height="16" viewBox="0 0 24 24">
+            <path
+              d="M6 6l12 12M18 6L6 18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+        <span>Clear History</span>
+      </button>
+    </div>
+          <div className="historyList">
+            {history.map((item) => (
+              <details key={item.id} className="historyItem">
+                <summary className="historySummary">
+                  <div className="historySummaryMain">
+                    <span className={`historyModeTag mode-${item.mode}`}>
+                      {modeReadable(item.mode)}
+                    </span>
+                    <span className="historyAskText">
+                      {item.ask ? item.ask : "(No explicit question provided)"}
+                    </span>
+                  </div>
+                  <span className="historyTimestamp">{item.timestamp}</span>
+                </summary>
+                <div className="historyBody">
+                  <div className="historyMeta">
+                    <p>
+                      <strong>Mode:</strong> {modeReadable(item.mode)}
+                    </p>
+                    {item.code && (
+                      <div className="historyCode">
+                        <strong>Text submitted:</strong>
+                        <pre>
+                          <code>{item.code}</code>
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                  {item.images.length > 0 && (
+                    <div className="historyImages" aria-label="Images used in this session">
+                      {item.images.map((img, i) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={`${item.id}-img-${i}`}
+                          src={img.src}
+                          alt={img.name || `History image ${i + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <div className="historyResponse">
+                    <h3>AI Guidance</h3>
+                    <div className="historyResponseText">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {item.aiText}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
       <footer className="foot">
         <p>
-          Built for students • Edison Law 2025 • Monte Vista High School • v1.2.7
+          Built for students • Edison Law 2025 • San Ramon Valley Unified School District • v1.2.7
         </p>
       </footer>
     </main>
