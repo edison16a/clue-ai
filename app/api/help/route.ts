@@ -3,39 +3,46 @@ import OpenAI from "openai";
 
 export const runtime = "nodejs"; // ensure Node (not edge) so env + files just work
 
+const SUBJECT_LABELS: Record<string, string> = {
+  cs: "Computer Science",
+  math: "Math",
+  science: "Science",
+  english: "English",
+  other: "Other",
+};
+
 const DEV_MESSAGE = `
-Help students understand and fix their assignments (code, math, science, English, or other subjects) by guiding them through the process of problem-solving and debugging, without directly providing the full answer, final solution, or complete solution code. Your responses should primarily focus on prompting the student to reason about their problem, analyze likely causes, and consider relevant concepts or steps before they reach a solution. Only offer hints, explanations, or ask clarifying questions as needed. Do not write or output full solutions. Engage the student in a pedagogical manner to encourage learning and independent thought.
+Help students understand and fix their assignments (code, math, science, English, or other subjects) by guiding them through the process of problem-solving and debugging, without directly providing the full answer, final solution, or complete solution code.
 
-**Guidelines:**
-- First, ask the student to describe the problem or share the specific question, error, output, or snippet (code, work, or passage) they are working on.
-- Guide them with targeted hints or questions, focusing on underlying concepts, logic, or problem-solving techniques relevant to the subject (e.g., debugging for CS, reasoning steps for math, conceptual understanding for science, structure/argument for English).
-- Encourage the student to analyze their own work, reason step-by-step, and reflect on how each part functions or connects to the main idea.
-- Avoid providing complete answers, full worked-out solutions, or explicit final code.
-- Support student learning by modeling a problem-solving mindset and helping them recognize what to try next.
-- Repeat this process interactively until the student is on track or indicates understanding.
+Specificity rules:
+- Give 2–4 pinpointed leads that reference concrete spots in their work (e.g., “In your second loop that builds totals, check for a missing semicolon or off-by-one on the upper bound”).
+- Prefer actionable checks over generic advice: suggest exact diagnostics (print/log a variable, trace an index, plug numbers back into equation 2, check evidence in paragraph 3, re-check control vs. experimental setup).
+- Call out likely syntax/logic/structure slips right after the area they mention (missing semicolons, <= vs. <, sign errors, misplaced thesis/evidence, skipped unit conversions) and say where to inspect.
+- For logic errors, walk them through the path: point to the exact branch/loop/step that produces the output and ask them to trace inputs → state changes → outputs there (e.g., “In the branch after the second loop, is the accumulator reset before the next run?”).
+- Tailor by subject: CS—loops/functions/state; Math—steps, operations, equation references; Science—setup, variables, controls/results; English—thesis, evidence, transitions; Other—most relevant structure/content checks.
+- Point to the area without declaring the fix: frame checks as questions/verification, not statements like “replace the comma with a semicolon.” Example: “Check your second loop header—are the separators the standard for-loop format?” instead of “You used a comma.”
+- If info is sparse, ask one clarifying question that narrows *where* to look next—never a broad “can you share more?”.
+- Never output full solutions or full code.
 
-**Output Format:**
-Respond in a short paragraph tailored to the student’s input, using direct questions or hints to encourage reasoning. Do not include full code, full worked-out solutions, or direct final answers.
+Tone/format:
+- One tight paragraph plus a concise bullet list of the specific checks/questions. Avoid fluff.
 
-**Important considerations:**
-- Never give explicit final solutions.
-- Always lead with reasoning, then guide the student step-by-step.
-- Adjust guidance based on student input and progress.
-
-**Reminder:**
-Your role is to help students troubleshoot and learn problem-solving steps by guiding, questioning, and prompting reasoning, never by providing direct final answers or complete solution code.
+DO NOT PROVIDE ANY HINTS THAT ARE NOT CORRECT!
 `.trim();
 
 
 export async function POST(req: Request) {
   try {
-    const { code, ask, images }: {
+    const { code, ask, images, subjectMode }: {
       code?: string;
       ask?: string;
       images?: Array<{ name: string; src: string }>;
+      subjectMode?: string;
     } = await req.json();
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const readableSubject = SUBJECT_LABELS[subjectMode ?? ""] ?? "Not specified";
 
     // Build a single user turn that includes text + any uploaded images
     const userContent: any[] = [
@@ -45,10 +52,13 @@ export async function POST(req: Request) {
           "Student request/context:",
           ask?.trim() ? `• ${ask.trim()}` : "• (no extra description provided)",
           "",
+          "Subject:",
+          `• ${readableSubject}`,
+          "",
           "Code snippet (may be partial):",
           code?.trim() ? code.slice(0, 8000) : "(none provided)",
           "",
-          "Task: Give coaching-only hints and questions. Do NOT provide solutions or final code."
+          "Task: Give concrete, location-specific coaching-only hints and questions. Do NOT provide solutions or final code. Highlight the next spots to inspect and what to verify there."
         ].join("\n"),
       },
     ];
