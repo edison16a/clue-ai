@@ -144,7 +144,7 @@ body.root {
 
 .codebox {
   width: 100%;
-  min-height: 220px;
+  min-height: 400px;
   resize: vertical;
   font-family: var(--font-mono);
   font-size: 13.5px;
