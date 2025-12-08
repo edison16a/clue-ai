@@ -78,6 +78,7 @@ export default function Page() {
 
   // NEW: theme state
   const [theme, setTheme] = useState<ThemeMode>("dark");
+  const [showMoreSubjects, setShowMoreSubjects] = useState<boolean>(false);
 
   // NEW: line-level hints from locator
   const [lineHints, setLineHints] = useState<LineHint[]>([]);
@@ -146,6 +147,11 @@ export default function Page() {
     }
   }, [theme]);
 
+  // Keep extra subject chips visible when a non-CS mode is active
+  useEffect(() => {
+    if (subjectMode !== "cs") setShowMoreSubjects(true);
+  }, [subjectMode]);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Derived text based on subject mode (labels / placeholders)
@@ -197,7 +203,18 @@ export default function Page() {
     }
   };
 
-  // NEW: util to add multiple files
+  const visibleModes = showMoreSubjects
+    ? SUBJECT_MODES
+    : SUBJECT_MODES.filter((mode) => mode.id === "cs");
+
+  const isTextLikeFile = (file: File): boolean => {
+    if (file.type.startsWith("text/")) return true;
+    return /\.(txt|java|py|js|ts|tsx|c|cpp|cs|rb|go|rs|php|swift|kt|kts|m|scala)$/i.test(
+      file.name || "",
+    );
+  };
+
+  // NEW: util to add multiple files (images -> previews, text/code files -> code box)
   const addFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
@@ -206,14 +223,28 @@ export default function Page() {
 
     Array.from(files).forEach((file, idx) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        const src = reader.result as string;
-        setImages((prev) => [...prev, { name: file.name, src }]);
 
-        // keep your legacy single-preview working (first file only)
-        if (idx === 0 && !imagePreview) setImagePreview(src);
-      };
-      reader.readAsDataURL(file);
+      // Route images through the old flow
+      if (file.type.startsWith("image/")) {
+        reader.onload = () => {
+          const src = reader.result as string;
+          setImages((prev) => [...prev, { name: file.name, src }]);
+
+          // keep your legacy single-preview working (first file only)
+          if (idx === 0 && !imagePreview) setImagePreview(src);
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      // Route text/code files straight into the code box
+      if (isTextLikeFile(file)) {
+        reader.onload = () => {
+          const text = (reader.result as string) ?? "";
+          setCode((prev) => (prev ? `${prev}\n\n${text}` : text));
+        };
+        reader.readAsText(file);
+      }
     });
   };
 
@@ -248,16 +279,40 @@ export default function Page() {
     });
   };
 
+  const extractCodeFromImages = async (): Promise<string> => {
+    const res = await fetch("/api/extract", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ images, ask, subjectMode }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || "Failed to extract code from image");
+
+    const extracted = (data.aiText ?? "").trim();
+    if (!extracted) throw new Error("No text extracted from image");
+    return extracted;
+  };
+
   // UPDATED: Help button -> start loading bar (no fake text)
   const onHelp = async () => {
     try {
       setAiText("");
       setIsLoading(true);
 
+      const needsExtraction = images.length > 0 && (!code || code.trim() === "");
+      let workingCode = code;
+
+      if (needsExtraction) {
+        const extracted = await extractCodeFromImages();
+        workingCode = extracted;
+        setCode(extracted);
+      }
+
       const res = await fetch("/api/help", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, ask, images, subjectMode }), // NEW: send subjectMode too
+        body: JSON.stringify({ code: workingCode, ask, images, subjectMode }), // NEW: send subjectMode too
       });
 
       const data = await res.json();
@@ -274,7 +329,7 @@ export default function Page() {
             timestamp: new Date().toLocaleString(),
             mode: subjectMode,
             ask,
-            code,
+            code: workingCode,
             images: images.map((img) => ({ ...img })), // snapshot
             aiText: cleanText,
           },
@@ -282,7 +337,7 @@ export default function Page() {
         ];
         return next.slice(0, 10); // cap at 10 items
       });
-      await runLocateLines();
+      await runLocateLines(workingCode);
     } catch (e: any) {
       const errMsg = `Oops — ${e?.message || "something went wrong."}`;
       setAiText(errMsg);
@@ -295,7 +350,7 @@ export default function Page() {
             timestamp: new Date().toLocaleString(),
             mode: subjectMode,
             ask,
-            code,
+            code: code,
             images: images.map((img) => ({ ...img })),
             aiText: errMsg,
           },
@@ -336,8 +391,11 @@ export default function Page() {
   };
 
   // NEW: ask AI for likely line ranges to inspect (auto after guidance)
-  const runLocateLines = async () => {
-    if (!codeLines.length || code.length === 0) {
+  const runLocateLines = async (codeOverride?: string) => {
+    const codeToUse = typeof codeOverride === "string" ? codeOverride : code;
+    const lines = codeToUse.split(/\r?\n/);
+
+    if (!lines.length || codeToUse.length === 0) {
       setLineHints([]);
       setLineHintNote("");
       return;
@@ -350,13 +408,13 @@ export default function Page() {
       const res = await fetch("/api/locate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, ask, subjectMode }),
+        body: JSON.stringify({ code: codeToUse, ask, subjectMode }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Request failed");
 
       const aiText: string = typeof data?.aiText === "string" ? data.aiText : "";
-      const parsed = parseLocatorText(aiText, codeLines.length || 1);
+      const parsed = parseLocatorText(aiText, lines.length || 1);
       setLineHints(parsed.ranges);
       setLineHintNote(parsed.note || (!parsed.ranges.length ? "No line ranges returned." : ""));
     } catch (e: any) {
@@ -384,7 +442,7 @@ export default function Page() {
 
         {/* NEW: subject-mode toggle bar */}
         <div className="modeBar" aria-label="Choose subject mode">
-          {SUBJECT_MODES.map((mode) => {
+          {visibleModes.map((mode) => {
             const active = subjectMode === mode.id;
             return (
               <button
@@ -435,6 +493,32 @@ export default function Page() {
               </button>
             );
           })}
+          {!showMoreSubjects && (
+            <button
+              type="button"
+              className="modeChip"
+              onClick={() => setShowMoreSubjects(true)}
+              aria-pressed={showMoreSubjects}
+            >
+              <span className="modeIcon" aria-hidden="true">
+                +
+              </span>
+              <span className="modeLabelText">More Subjects (Beta)</span>
+            </button>
+          )}
+          {showMoreSubjects && (
+            <button
+              type="button"
+              className="modeChip"
+              onClick={() => setShowMoreSubjects(false)}
+              aria-pressed={!showMoreSubjects}
+            >
+              <span className="modeIcon" aria-hidden="true">
+                –
+              </span>
+              <span className="modeLabelText">Hide extra subjects</span>
+            </button>
+          )}
         </div>
         {/* REMOVED Start button */}
       </header>
@@ -536,7 +620,7 @@ export default function Page() {
                 ref={fileInputRef}
                 type="file"
                 multiple // NEW
-                accept="image/*"
+                accept="image/*,.txt,.java,.py,.js,.ts,.tsx,.c,.cpp,.cs,.rb,.go,.rs,.php,.swift,.kt,.kts,.m,.scala"
                 className="hiddenFile"
                 onChange={onFileChange}
                 aria-label={uploadAriaLabel}
