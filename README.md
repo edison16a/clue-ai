@@ -19,7 +19,7 @@ Think of it as that supportive teacher who nudges you in the right direction, as
 
 ## 🚀 Screenshots
 
-<img width="1214" height="812" alt="Screenshot 2025-12-08 at 1 02 20 PM" src="https://github.com/user-attachments/assets/5397e617-ea69-4888-b492-230127a0c4fb" />
+<img width="971" height="808" alt="Screenshot 2025-12-08 at 1 56 47 PM" src="https://github.com/user-attachments/assets/e81d154f-6cc9-40be-bc94-4acb170b45ef" />
 <img width="1176" height="577" alt="Screenshot 2025-12-08 at 1 02 35 PM" src="https://github.com/user-attachments/assets/be9697fc-ead9-4fe0-b26c-bdd801c95c60" />
 
 
