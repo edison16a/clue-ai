@@ -11,12 +11,48 @@ type SubjectMode = "cs" | "math" | "science" | "english" | "other";
 // NEW: theme mode type
 type ThemeMode = "dark" | "light";
 
+type LineHint = { start: number; end: number; reason?: string };
+
+const parseLocatorText = (
+  text: string,
+  totalLines: number,
+): { ranges: LineHint[]; note: string } => {
+  const ranges: LineHint[] = [];
+  let note = "";
+
+  text.split(/\r?\n/).forEach((line) => {
+    const m = line.match(/^\s*-\s*(\d+)(?:\s*[-–]\s*(\d+))?\s*\|\s*(.+)$/i);
+    if (m) {
+      const start = Number(m[1]);
+      const endRaw = m[2] ? Number(m[2]) : start;
+      if (Number.isFinite(start) && start > 0) {
+        const normalizedEnd = Number.isFinite(endRaw) && endRaw >= start ? endRaw : start;
+        ranges.push({ start, end: normalizedEnd, reason: m[3]?.trim() });
+      }
+      return;
+    }
+
+    if (line.toUpperCase().startsWith("NOTE:")) {
+      note = line.slice(5).trim();
+    }
+  });
+
+  const adjusted = ranges.map((r) => {
+    if (totalLines <= 0) return r;
+    const start = Math.max(1, r.start - 1);
+    const end = Math.min(totalLines, Math.max(r.end, r.start) + 1);
+    return { ...r, start, end };
+  });
+
+  return { ranges: adjusted, note };
+};
+
 const SUBJECT_MODES: { id: SubjectMode; label: string; hint: string }[] = [
   { id: "cs", label: "Computer Science", hint: "" },
-  { id: "math", label: "Math", hint: "" },
-  { id: "science", label: "Science", hint: "" },
-  { id: "english", label: "English", hint: "" },
-  { id: "other", label: "Other", hint: "" },
+  { id: "math", label: "Math", hint: "BETA" },
+  { id: "science", label: "Science", hint: "BETA" },
+  { id: "english", label: "English", hint: "BETA" },
+  { id: "other", label: "Other", hint: "BETA" },
 ];
 
 type HistoryItem = {
@@ -42,6 +78,13 @@ export default function Page() {
 
   // NEW: theme state
   const [theme, setTheme] = useState<ThemeMode>("dark");
+
+  // NEW: line-level hints from locator
+  const [lineHints, setLineHints] = useState<LineHint[]>([]);
+  const [lineHintNote, setLineHintNote] = useState<string>("");
+  const [isLocating, setIsLocating] = useState<boolean>(false);
+
+  const codeLines = code.split(/\r?\n/);
 
   useEffect(() => {
     if (typeof window === "undefined") return; // safety for SSR
@@ -239,6 +282,7 @@ export default function Page() {
         ];
         return next.slice(0, 10); // cap at 10 items
       });
+      await runLocateLines();
     } catch (e: any) {
       const errMsg = `Oops — ${e?.message || "something went wrong."}`;
       setAiText(errMsg);
@@ -274,6 +318,8 @@ export default function Page() {
     setImagePreview(null);
     setAiText("");
     setIsLoading(false);
+    setLineHints([]);
+    setLineHintNote("");
   };
 
     // NEW: clear saved history (state + localStorage)
@@ -287,6 +333,43 @@ export default function Page() {
         // ignore
       }
     }
+  };
+
+  // NEW: ask AI for likely line ranges to inspect (auto after guidance)
+  const runLocateLines = async () => {
+    if (!codeLines.length || code.length === 0) {
+      setLineHints([]);
+      setLineHintNote("");
+      return;
+    }
+
+    try {
+      setIsLocating(true);
+      setLineHintNote("");
+      setLineHints([]);
+      const res = await fetch("/api/locate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, ask, subjectMode }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
+
+      const aiText: string = typeof data?.aiText === "string" ? data.aiText : "";
+      const parsed = parseLocatorText(aiText, codeLines.length || 1);
+      setLineHints(parsed.ranges);
+      setLineHintNote(parsed.note || (!parsed.ranges.length ? "No line ranges returned." : ""));
+    } catch (e: any) {
+      setLineHintNote(`Could not locate lines: ${e?.message || "unknown error"}`);
+      setLineHints([]);
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
+  const clearLineHints = () => {
+    setLineHints([]);
+    setLineHintNote("");
   };
 
 
@@ -362,14 +445,66 @@ export default function Page() {
             <label htmlFor="code" className="label">
               {codeLabel}
             </label>
-            <textarea
-              id="code"
-              className="codebox"
-              placeholder={codePlaceholder}
-              spellCheck={false}
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
+            <div className="codeboxWrap">
+              <textarea
+                id="code"
+                className="codebox"
+                placeholder={codePlaceholder}
+                spellCheck={false}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+
+              {(lineHints.length > 0 || isLocating) && (
+                <div className="codeOverlay" role="region" aria-label="Highlighted code lines">
+                  {isLocating ? (
+                    <div className="overlayLoader" aria-busy="true">
+                      <div className="loaderTrack">
+                        <div className="loaderBar" />
+                      </div>
+                      <p className="loaderHint">Locating likely lines…</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="codeOverlayHeader">
+                        <p className="codeHighlightTitle">Likely Error Lines</p>
+                        <button
+                          type="button"
+                          className="clearHighlightBtn"
+                          onClick={clearLineHints}
+                          title="Clear highlighted lines"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                      {lineHintNote && lineHintNote.toLowerCase() !== "none" && (
+                        <p className="codeHighlightNote">{lineHintNote}</p>
+                      )}
+                      <div className="codeHighlightBody">
+                        {codeLines.map((line, idx) => {
+                          const lineNumber = idx + 1;
+                          const isPrimary = lineHints.some(
+                            (range) => lineNumber >= range.start && lineNumber <= range.end,
+                          );
+                          const isContext = lineHints.some(
+                            (range) =>
+                              (lineNumber === range.start - 1 && lineNumber >= 1) ||
+                              (lineNumber === range.end + 1 && lineNumber <= codeLines.length),
+                          );
+                          const cls = isPrimary ? "isHit" : isContext ? "isContext" : "";
+                          return (
+                            <div key={`hl-${lineNumber}`} className={`hlLine ${cls}`}>
+                              <span className="hlNo">{lineNumber}</span>
+                              <span className="hlText">{line || " "}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* NEW: Optional guidance input */}
@@ -488,7 +623,7 @@ export default function Page() {
                   />
                 </svg>
               </span>
-              <span>Clear Existing Prompt &amp; Response</span>
+              <span>New Prompt or Clear Existing Prompt and Response</span>
             </button>
 
             {/* legacy single preview block (kept). Hidden via CSS when gallery present */}
@@ -499,6 +634,7 @@ export default function Page() {
               </div>
             )}
           </div>
+
         </div>
 
         <div className="right">
