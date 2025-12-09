@@ -422,19 +422,20 @@ body.root {
 /* Nice defaults for markdown elements */
 .aiText p { margin: 0.5em 0; }
 .aiText ul, .aiText ol { margin: 0.5em 0 0.5em 1.25em; }
-.aiText code {
+.aiText code,
+.historyResponseText code {
   font-family: var(--font-mono);
   font-size: 0.95em;
-  background: rgba(0,0,0,.22);
-  border: 1px solid rgba(255,255,255,.08);
-  padding: 0.1em 0.35em;
+  background: rgba(249, 243, 243, 0.12);       /* lighter for readability in dark mode */
+  border: 1px solid rgba(255,255,255,.18);
+  padding: 0.12em 0.38em;
   border-radius: 6px;
 }
 .aiText pre {
   margin: 0.75em 0;                  /* tighter than browser default */
   padding: 10px 12px;
-  background: rgba(0,0,0,.22);
-  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.07);       /* lighter block for dark mode */
+  border: 1px solid rgba(255,255,255,.16);
   border-radius: var(--radius-md);
   overflow: auto;
 }
@@ -1176,9 +1177,9 @@ body.root {
 .historyResponseText pre {
   margin: 0.5em 0;
   padding: 8px 10px;
-  background: rgba(0, 0, 0, 0.24);
+  background: rgba(255, 255, 255, 0.07);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   overflow: auto;
 }
 
