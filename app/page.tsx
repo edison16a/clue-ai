@@ -78,6 +78,7 @@ export default function Page() {
 
   // NEW: theme state
   const [theme, setTheme] = useState<ThemeMode>("dark");
+  const [saveHistory, setSaveHistory] = useState<boolean>(true);
   const [showMoreSubjects, setShowMoreSubjects] = useState<boolean>(false);
 
   // NEW: line-level hints from locator
@@ -91,10 +92,18 @@ export default function Page() {
     if (typeof window === "undefined") return; // safety for SSR
 
     try {
-      const raw = window.localStorage.getItem("clueai-history-v1");
-      if (raw) {
-        const parsed = JSON.parse(raw) as HistoryItem[];
-        setHistory(parsed);
+      const pref = window.localStorage.getItem("clueai-save-history");
+      const allow = pref !== "off";
+      setSaveHistory(allow);
+
+      if (allow) {
+        const raw = window.localStorage.getItem("clueai-history-v1");
+        if (raw) {
+          const parsed = JSON.parse(raw) as HistoryItem[];
+          setHistory(parsed);
+        }
+      } else {
+        setHistory([]);
       }
     } catch (err) {
       console.error("Failed to load history from localStorage:", err);
@@ -105,6 +114,8 @@ export default function Page() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    if (!saveHistory) return;
+
     try {
       // NOTE: This will store images (base64) too — if you hit size limits later,
       // you can strip images here before saving.
@@ -112,7 +123,7 @@ export default function Page() {
     } catch (err) {
       console.error("Failed to save history to localStorage:", err);
     }
-  }, [history]);
+  }, [history, saveHistory]);
 
   // NEW: load initial theme from localStorage / system preference
   useEffect(() => {
@@ -124,9 +135,7 @@ export default function Page() {
         setTheme(stored);
         return;
       }
-
-      const prefersLight = window.matchMedia?.("(prefers-color-scheme: light)").matches;
-      setTheme(prefersLight ? "light" : "dark");
+      setTheme("dark");
     } catch {
       // fall back to default "dark"
     }
@@ -146,6 +155,20 @@ export default function Page() {
       // ignore
     }
   }, [theme]);
+
+  // NEW: persist save-history preference + clear storage when off
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("clueai-save-history", saveHistory ? "on" : "off");
+      if (!saveHistory) {
+        window.localStorage.removeItem("clueai-history-v1");
+        setHistory([]);
+      }
+    } catch (err) {
+      console.error("Failed to persist save-history preference:", err);
+    }
+  }, [saveHistory]);
 
   // Keep extra subject chips visible when a non-CS mode is active
   useEffect(() => {
@@ -322,42 +345,46 @@ export default function Page() {
       setAiText(cleanText);
 
       // NEW: push to history (snapshot of current interaction) with max 10 items
-      setHistory((prev) => {
-        const next: HistoryItem[] = [
-          {
-            id: Date.now(),
-            timestamp: new Date().toLocaleString(),
-            mode: subjectMode,
-            ask,
-            code: workingCode,
-            images: images.map((img) => ({ ...img })), // snapshot
-            aiText: cleanText,
-          },
-          ...prev,
-        ];
-        return next.slice(0, 10); // cap at 10 items
-      });
+      if (saveHistory) {
+        setHistory((prev) => {
+          const next: HistoryItem[] = [
+            {
+              id: Date.now(),
+              timestamp: new Date().toLocaleString(),
+              mode: subjectMode,
+              ask,
+              code: workingCode,
+              images: images.map((img) => ({ ...img })), // snapshot
+              aiText: cleanText,
+            },
+            ...prev,
+          ];
+          return next.slice(0, 10); // cap at 10 items
+        });
+      }
       await runLocateLines(workingCode);
     } catch (e: any) {
       const errMsg = `Oops — ${e?.message || "something went wrong."}`;
       setAiText(errMsg);
 
       // also log failures in history so user can see what happened (also capped at 10)
-      setHistory((prev) => {
-        const next: HistoryItem[] = [
-          {
-            id: Date.now(),
-            timestamp: new Date().toLocaleString(),
-            mode: subjectMode,
-            ask,
-            code: code,
-            images: images.map((img) => ({ ...img })),
-            aiText: errMsg,
-          },
-          ...prev,
-        ];
-        return next.slice(0, 10); // cap at 10 items
-      });
+      if (saveHistory) {
+        setHistory((prev) => {
+          const next: HistoryItem[] = [
+            {
+              id: Date.now(),
+              timestamp: new Date().toLocaleString(),
+              mode: subjectMode,
+              ask,
+              code: code,
+              images: images.map((img) => ({ ...img })),
+              aiText: errMsg,
+            },
+            ...prev,
+          ];
+          return next.slice(0, 10); // cap at 10 items
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -430,10 +457,95 @@ export default function Page() {
     setLineHintNote("");
   };
 
+  const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  const toggleSaveHistory = () => setSaveHistory((prev) => !prev);
+
 
   return (
     <main className="container">
       <header className="hero">
+        <div className="heroTop">
+          <button
+            type="button"
+            className={`saveToggleBtn ${saveHistory ? "isOn" : "isOff"}`}
+            onClick={toggleSaveHistory}
+            aria-pressed={saveHistory}
+            title={saveHistory ? "Saving history is ON" : "Saving history is OFF"}
+          >
+            <span className="saveGlyph" aria-hidden="true">
+              {saveHistory ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" role="presentation">
+                  <path
+                    d="M5 4h12l2 3v13H5z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9 4v5h6V4m-6 11l2.2 2.2L17 11"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" role="presentation">
+                  <path
+                    d="M5 4h12l2 3v13H5zM4 4l16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </span>
+            <span className="saveToggleText">
+              {saveHistory ? "Saving on" : "Saving off"}
+            </span>
+          </button>
+          <button
+            type="button"
+            className={`themeToggleBtn ${theme === "light" ? "isLight" : "isDark"}`}
+            onClick={toggleTheme}
+            aria-pressed={theme === "light"}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+          >
+            <span className="themeGlyph" aria-hidden="true">
+              {theme === "light" ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" role="presentation">
+                  <path
+                    d="M12 4v2m0 12v2m8-8h-2M6 12H4m12.95-5.66l-1.41 1.41M8.46 16.54l-1.41 1.41m0-11.8l1.41 1.41m8.08 8.08l1.41 1.41M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" role="presentation">
+                  <path
+                    d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </span>
+            <span className="themeToggleText">
+              {theme === "light" ? "Light" : "Dark"} mode
+            </span>
+          </button>
+        </div>
         <h1 className="brand">Clue-ai</h1>
         <p className="tagline">
           An AI Agent that helps students troubleshoot assignments without
