@@ -548,7 +548,7 @@ export default function Page() {
         </div>
         <h1 className="brand">Clue-ai</h1>
         <p className="tagline">
-          An AI Agent that helps students troubleshoot assignments without
+          An AI that helps students troubleshoot assignments without
           directly giving the answer.
         </p>
 
