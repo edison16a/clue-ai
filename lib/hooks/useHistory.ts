@@ -2,8 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import configData from "@/data/config.json";
-import { STORAGE_KEYS, readRaw, removeRaw, writeJson, writeRaw } from "@/lib/storage";
-import { createHistoryItem, withNewEntry, type HistoryDraft } from "@/lib/history";
+import { STORAGE_KEYS, readJson, readRaw, removeRaw, writeJson, writeRaw } from "@/lib/storage";
+import {
+  createHistoryItem,
+  isHistoryArray,
+  withNewEntry,
+  type HistoryDraft,
+} from "@/lib/history";
 import type { HistoryItem } from "@/lib/types";
 
 /** The stored opt-out is a sentinel string, not JSON; only "off" disables. */
@@ -44,14 +49,15 @@ export function useHistory() {
     setSaveHistory(allowed);
 
     if (allowed) {
-      const raw = readRaw(STORAGE_KEYS.history);
-      if (raw) {
-        try {
-          setHistory(JSON.parse(raw) as HistoryItem[]);
-        } catch (error) {
-          console.error("Failed to load history from localStorage:", error);
-        }
-      }
+      // Validated, not just parsed. This used to be `JSON.parse(raw) as
+      // HistoryItem[]` — a cast, which checks nothing at runtime. A stored
+      // value that is valid JSON of the wrong shape therefore reached React
+      // intact: a string has a truthy `.length`, so the history section
+      // rendered and `item.images.map` threw, taking the whole page down with
+      // an unrecoverable white screen. Nothing on the page could clear the bad
+      // value, because the page could not render. Dropping it is strictly
+      // better than that.
+      setHistory(readJson(STORAGE_KEYS.history, isHistoryArray, []));
     } else {
       setHistory([]);
     }
