@@ -8,11 +8,11 @@
       "locate": "gpt-4o",
       "extract": "gpt-4o"
     },
-    "$storeComment": "Only the help route set `store: true`, to retain threads for continuity/analytics. Preserved per-endpoint rather than made uniform.",
+    "$storeComment": "Whether OpenAI retains the response. All three are true because that is what the pre-refactor code did: help passed `store: true` explicitly, and locate and extract omitted the field, which the Responses API defaults to true. Kept per-endpoint so retention can be turned off for one call without affecting the others.",
     "store": {
       "help": true,
-      "locate": false,
-      "extract": false
+      "locate": true,
+      "extract": true
     }
   },
 

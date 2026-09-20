@@ -30,11 +30,15 @@ export function modelFor(endpoint: Endpoint): string {
 }
 
 /**
- * Whether OpenAI should retain the conversation for an endpoint.
+ * Whether OpenAI should retain the response for an endpoint.
  *
- * Only `help` set this. It is kept per-endpoint rather than collapsed to one
- * flag because turning it on for extract and locate would start retaining
- * students' submitted work on calls that never did before.
+ * All three are currently true, which is what the pre-refactor code did —
+ * though only one of them said so. `help` passed `store: true` explicitly;
+ * locate and extract omitted the field, and the Responses API defaults it to
+ * true. Reading the old code, it looked as though two of the three calls did
+ * not retain anything; making the value explicit is the point of moving it to
+ * config. Kept per-endpoint so retention can be disabled for one call without
+ * silently changing the others.
  */
 export function storeFor(endpoint: Endpoint): boolean {
   return configData.openai.store[endpoint];
