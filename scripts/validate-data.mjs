@@ -15,6 +15,7 @@
  */
 import { readFileSync } from "node:fs";
 import { extractSubjects } from "./extract-subjects.mjs";
+import { extractPrompts } from "./extract-prompts.mjs";
 
 let failures = 0;
 let checks = 0;
@@ -99,6 +100,39 @@ check("round-trips against the pre-refactor source", () => {
     subjectsFile.subjects,
     extractSubjects().subjects,
     "data/subjects.json has drifted from what the baseline commit rendered",
+  );
+});
+
+// ----------------------------------------------------------------- prompts
+
+console.log("\ndata/prompts/");
+const baselinePrompts = extractPrompts();
+
+for (const [name, expected] of Object.entries(baselinePrompts)) {
+  const file = `../data/prompts/${name}.md`;
+  check(`${name}.md is byte-identical to the baseline prompt`, () => {
+    const onDisk = readFileSync(new URL(file, import.meta.url), "utf8").trim();
+    assert(
+      onDisk === expected,
+      `${name}.md differs from the prompt the pre-refactor route sent ` +
+        `(${onDisk.length} chars on disk vs ${expected.length} in the baseline)`,
+    );
+  });
+}
+
+check("the locate prompt still documents the format the parser expects", () => {
+  // lib/locator.ts parses `- <start>-<end> | <reason>` bullets under a LINES:
+  // header plus an optional NOTE: line. The prompt is what makes the model
+  // emit that shape, so the two must not drift apart independently.
+  const locate = readFileSync(
+    new URL("../data/prompts/locate.md", import.meta.url),
+    "utf8",
+  );
+  assert(locate.includes("LINES:"), "locate prompt no longer asks for a LINES: header");
+  assert(locate.includes("NOTE:"), "locate prompt no longer asks for a NOTE: line");
+  assert(
+    /-\s*\d+-\d+\s*\|/.test(locate),
+    "locate prompt no longer shows the `- start-end | reason` bullet form",
   );
 });
 
