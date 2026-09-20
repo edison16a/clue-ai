@@ -1,5 +1,6 @@
 import "server-only";
 import configData from "@/data/config.json";
+import strings from "@/data/strings.json";
 import { apiLabelFor } from "@/lib/subjects";
 import { stripCodeFences } from "@/lib/fences";
 import { buildNumberedListing, splitLines } from "@/lib/numbering";
@@ -86,7 +87,9 @@ export async function requestHelp(body: HelpRequest): Promise<string> {
     ],
   });
 
-  return response.output_text ?? "";
+  // `??` rather than `||`: an empty string is a real, if unhelpful, reply and
+  // is passed through as the original did. Only a missing field falls back.
+  return response.output_text ?? strings.response.emptyResponseFallback;
 }
 
 /**
