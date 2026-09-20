@@ -12,6 +12,10 @@
  * diffed. A section moved across a duplicate selector, or a dropped rule,
  * shows up here as a changed or missing key.
  *
+ * Declarations intentionally deleted since the baseline are listed in
+ * REMOVED_SELECTORS below, with the reason. Anything missing that is *not* on
+ * that list, any value that changed, and anything added are all failures.
+ *
  * Usage: node scripts/verify-stylesheet.mjs
  */
 import { execFileSync } from "node:child_process";
@@ -19,6 +23,44 @@ import { readFileSync } from "node:fs";
 
 const BASELINE_REF = "ec79f2d";
 const STYLES = new URL("../app/styles/", import.meta.url);
+
+/**
+ * Selectors deliberately removed after the split, because no markup in the app
+ * uses them. Listed explicitly so the check stays meaningful: a rule that
+ * disappears for any other reason still fails.
+ *
+ * Note that `.mode-cs` and friends are NOT here — they look unused to a grep
+ * but are built at runtime as `mode-${item.mode}`.
+ */
+const REMOVED_SELECTORS = [
+  // A hero "Start" button removed from the JSX long ago.
+  ".startBtn",
+  // A segmented theme picker, superseded by the single header toggle.
+  ".themeBar",
+  ".themeToggle",
+  ".themeIcon",
+  ".themeLabelText",
+  // An earlier design of the line hints, as a card below the textarea rather
+  // than an overlay on top of it.
+  ".codeHighlightCard",
+  ".codeHighlightHeader",
+  ".codeHighlightEmpty",
+  ".codeHighlightReasons",
+];
+
+/**
+ * Whether a flattened key belongs to one of the removed selectors.
+ *
+ * Matched on a class-name boundary rather than by substring, so
+ * `.themeToggle.isActive` and `:root.theme-light .themeToggle:hover` are both
+ * recognised while a hypothetical `.themeToggleBtn` — which is live — is not.
+ */
+function isRemoved(key) {
+  const selector = key.split("||")[1] ?? "";
+  return REMOVED_SELECTORS.some((dead) =>
+    new RegExp(`\\${dead}(?![\\w-])`).test(selector),
+  );
+}
 
 /** Removes comments so their text cannot be parsed as declarations. */
 function stripComments(css) {
@@ -100,9 +142,13 @@ const after = flatten(
 );
 
 const problems = [];
+let removed = 0;
+
 for (const [key, value] of before) {
-  if (!after.has(key)) problems.push(`MISSING  ${key} = ${value}`);
-  else if (after.get(key) !== value) {
+  if (!after.has(key)) {
+    if (isRemoved(key)) removed += 1;
+    else problems.push(`MISSING  ${key} = ${value}`);
+  } else if (after.get(key) !== value) {
     problems.push(`CHANGED  ${key}\n           before: ${value}\n           after:  ${after.get(key)}`);
   }
 }
@@ -111,12 +157,16 @@ for (const key of after.keys()) {
 }
 
 console.log(`baseline declarations: ${before.size}`);
-console.log(`split declarations:    ${after.size}`);
+console.log(`current declarations:  ${after.size}`);
 console.log(`stylesheets imported:  ${importedFiles.length}`);
+console.log(`intentionally removed: ${removed} (dead selectors)`);
 
 if (problems.length) {
-  console.error(`\n${problems.length} difference(s):`);
+  console.error(`\n${problems.length} unexpected difference(s):`);
   for (const problem of problems.slice(0, 40)) console.error(`  ${problem}`);
   process.exit(1);
 }
-console.log("\nok  every winning declaration is identical — the split is a no-op");
+console.log(
+  "\nok  every live declaration is identical to the baseline; " +
+    "the only losses are the dead selectors listed in this script",
+);
