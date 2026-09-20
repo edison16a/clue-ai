@@ -77,8 +77,15 @@ export function parseLocatorText(text: string, totalLines: number): LocatorResul
       continue;
     }
 
-    if (line.toUpperCase().startsWith(NOTE_PREFIX)) {
-      note = line.slice(NOTE_PREFIX.length).trim();
+    // Trimmed before matching. This previously tested the raw line, so a
+    // NOTE: with any leading whitespace was skipped — and the prompt's own
+    // "if unsure" example indents it by two spaces, which means the note was
+    // most likely to be dropped in exactly the case it exists to convey: the
+    // model having nothing confident to point at. The student then saw
+    // "No line ranges returned." with no explanation instead of the note.
+    const trimmed = line.trim();
+    if (trimmed.toUpperCase().startsWith(NOTE_PREFIX)) {
+      note = trimmed.slice(NOTE_PREFIX.length).trim();
     }
   }
 
