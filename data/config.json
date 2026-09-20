@@ -1,0 +1,38 @@
+{
+  "$comment": "Runtime configuration. Values here were magic literals scattered through the routes and the page component; changing a model or a cap should not require a code edit.",
+
+  "openai": {
+    "$comment": "One model per endpoint so any single call can be retargeted independently. All three were hard-coded to gpt-4o.",
+    "models": {
+      "help": "gpt-4o",
+      "locate": "gpt-4o",
+      "extract": "gpt-4o"
+    },
+    "$storeComment": "Only the help route set `store: true`, to retain threads for continuity/analytics. Preserved per-endpoint rather than made uniform.",
+    "store": {
+      "help": true,
+      "locate": false,
+      "extract": false
+    }
+  },
+
+  "limits": {
+    "$comment": "maxPromptChars truncates the submitted work before it is embedded in the prompt, guarding the context window. historyEntries caps what is kept in localStorage; the UI copy says 'past 10 questions'.",
+    "maxPromptChars": 8000,
+    "historyEntries": 10
+  },
+
+  "storageKeys": {
+    "$comment": "localStorage keys. `history` is versioned so a future shape change can be introduced without misreading old records.",
+    "history": "clueai-history-v1",
+    "saveHistory": "clueai-save-history",
+    "theme": "clueai-theme"
+  },
+
+  "defaults": {
+    "$comment": "Initial state before any stored preference is read. theme is 'dark' because the design was built dark-first; the system colour-scheme preference is deliberately not consulted, matching existing behavior.",
+    "subject": "cs",
+    "theme": "dark",
+    "saveHistory": true
+  }
+}

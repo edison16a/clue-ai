@@ -16,6 +16,7 @@
 import { readFileSync } from "node:fs";
 import { extractSubjects } from "./extract-subjects.mjs";
 import { extractPrompts } from "./extract-prompts.mjs";
+import { extractUploads } from "./extract-uploads.mjs";
 
 let failures = 0;
 let checks = 0;
@@ -100,6 +101,88 @@ check("round-trips against the pre-refactor source", () => {
     subjectsFile.subjects,
     extractSubjects().subjects,
     "data/subjects.json has drifted from what the baseline commit rendered",
+  );
+});
+
+// ----------------------------------------------------------------- uploads
+
+console.log("\ndata/uploads.json");
+const uploadsFile = readData("uploads.json");
+
+check("lists extensions without dots and without duplicates", () => {
+  assert(Array.isArray(uploadsFile.textExtensions), "textExtensions must be an array");
+  assert(uploadsFile.textExtensions.length > 0, "textExtensions must not be empty");
+  const seen = new Set();
+  for (const ext of uploadsFile.textExtensions) {
+    // A leading dot here would produce `accept=".​.java"` and a regex that
+    // matches nothing, so reject the shape rather than the symptom.
+    assert(/^[a-z0-9]+$/.test(ext), `extension ${JSON.stringify(ext)} must be bare and lowercase`);
+    assert(!seen.has(ext), `duplicate extension ${JSON.stringify(ext)}`);
+    seen.add(ext);
+  }
+});
+
+check("round-trips against the pre-refactor source", () => {
+  const baseline = extractUploads();
+  assertDeepEqual(
+    uploadsFile.textExtensions,
+    baseline.textExtensions,
+    "data/uploads.json has drifted from the original accept attribute",
+  );
+  assertDeepEqual(
+    uploadsFile.imageAcceptWildcards,
+    baseline.imageAcceptWildcards,
+    "data/uploads.json has drifted from the original accept attribute",
+  );
+});
+
+// ------------------------------------------------------------------ config
+
+console.log("\ndata/config.json");
+const configFile = readData("config.json");
+const ENDPOINTS = ["help", "locate", "extract"];
+
+check("names a model and a store flag for every endpoint", () => {
+  for (const endpoint of ENDPOINTS) {
+    assert(
+      typeof configFile.openai.models[endpoint] === "string" &&
+        configFile.openai.models[endpoint].length > 0,
+      `openai.models.${endpoint} is missing`,
+    );
+    assert(
+      typeof configFile.openai.store[endpoint] === "boolean",
+      `openai.store.${endpoint} is missing`,
+    );
+  }
+});
+
+check("limits are positive integers", () => {
+  for (const [name, value] of Object.entries(configFile.limits)) {
+    if (name.startsWith("$")) continue;
+    assert(Number.isInteger(value) && value > 0, `limits.${name} must be a positive integer`);
+  }
+});
+
+check("storage keys are distinct", () => {
+  const keys = Object.entries(configFile.storageKeys)
+    .filter(([name]) => !name.startsWith("$"))
+    .map(([, value]) => value);
+  assert(new Set(keys).size === keys.length, "two storage keys collide");
+});
+
+check("the default subject exists in data/subjects.json", () => {
+  // A default naming a subject that was since renamed would leave the app
+  // booting into a mode with no label, so bind the two files together here.
+  assert(
+    subjectsFile.subjects.some((s) => s.id === configFile.defaults.subject),
+    `defaults.subject "${configFile.defaults.subject}" is not a known subject id`,
+  );
+});
+
+check("the default theme is one the stylesheet defines", () => {
+  assert(
+    ["dark", "light"].includes(configFile.defaults.theme),
+    `defaults.theme "${configFile.defaults.theme}" has no :root.theme-* rules`,
   );
 });
 
