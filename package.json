@@ -13,7 +13,7 @@
     "generate:tokens": "node scripts/generate-tokens.mjs"
   },
   "dependencies": {
-    "next": "15.5.7",
+    "next": "^15.5.25",
     "openai": "^5.19.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
