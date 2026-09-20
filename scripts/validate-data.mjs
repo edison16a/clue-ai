@@ -17,6 +17,7 @@ import { readFileSync } from "node:fs";
 import { extractSubjects } from "./extract-subjects.mjs";
 import { extractPrompts } from "./extract-prompts.mjs";
 import { extractUploads } from "./extract-uploads.mjs";
+import { execFileSync } from "node:child_process";
 
 let failures = 0;
 let checks = 0;
@@ -183,6 +184,117 @@ check("the default theme is one the stylesheet defines", () => {
   assert(
     ["dark", "light"].includes(configFile.defaults.theme),
     `defaults.theme "${configFile.defaults.theme}" has no :root.theme-* rules`,
+  );
+});
+
+// ----------------------------------------------------------------- strings
+
+console.log("\ndata/strings.json");
+const stringsFile = readData("strings.json");
+
+/**
+ * The whole pre-refactor UI, whitespace-normalised.
+ *
+ * JSX collapses runs of whitespace when it renders, so a string that sits on
+ * three source lines renders as one. Comparing normalised forms is what lets a
+ * literal grep of the original source prove the extracted copy is unchanged.
+ */
+const baselineUi = ["app/page.tsx", "app/layout.tsx", "app/api/help/route.ts",
+  "app/api/extract/route.ts", "app/api/locate/route.ts"]
+  .map((path) =>
+    execFileSync("git", ["show", `ec79f2d:${path}`], {
+      encoding: "utf8",
+      maxBuffer: 32 * 1024 * 1024,
+    }),
+  )
+  .join("\n")
+  .replace(/\s+/g, " ");
+
+/** Walks every leaf string in the strings file, skipping `$comment` keys. */
+function* leafStrings(node, path = []) {
+  if (typeof node === "string") {
+    yield [path.join("."), node];
+    return;
+  }
+  if (Array.isArray(node)) {
+    for (const [i, child] of node.entries()) yield* leafStrings(child, [...path, i]);
+    return;
+  }
+  if (node && typeof node === "object") {
+    for (const [key, child] of Object.entries(node)) {
+      if (key.startsWith("$")) continue; // documentation, not content
+      yield* leafStrings(child, [...path, key]);
+    }
+  }
+}
+
+check("no leaf string is empty", () => {
+  for (const [path, value] of leafStrings(stringsFile)) {
+    assert(value.length > 0, `strings.${path} is empty`);
+  }
+});
+
+/**
+ * Strings the original never stored whole, so a verbatim grep cannot find
+ * them. Each maps to the source fragments it was built from; those fragments
+ * are asserted instead, which is the same proof one level down.
+ *
+ * Storing the assembled sentence here (rather than the fragments) is the point
+ * of the extraction: `{theme === "light" ? "Light" : "Dark"} mode` is not a
+ * string anyone can translate or copy-edit.
+ */
+const COMPOSED_IN_SOURCE = {
+  "toggles.themeLight": ['"Light" : "Dark"} mode'],
+  "toggles.themeDark": ['"Light" : "Dark"} mode'],
+  "toggles.themeTitleToLight": ['Switch to ${theme === "light" ? "dark" : "light"} mode'],
+  "toggles.themeTitleToDark": ['Switch to ${theme === "light" ? "dark" : "light"} mode'],
+};
+
+check("composed strings match the fragments the baseline built them from", () => {
+  for (const [path, fragments] of Object.entries(COMPOSED_IN_SOURCE)) {
+    for (const fragment of fragments) {
+      assert(
+        baselineUi.includes(fragment.replace(/\s+/g, " ")),
+        `strings.${path} claims to come from ${JSON.stringify(fragment)}, ` +
+          "which is not in the baseline source",
+      );
+    }
+  }
+});
+
+check("every string appears verbatim in the pre-refactor UI", () => {
+  // Strings assembled at runtime cannot appear whole in the source, so each is
+  // split on its `{placeholder}` slots and every literal fragment is checked
+  // independently. Fragments under 8 characters ("Mode:", "Clear") are too
+  // short for a substring match to mean anything, so they are skipped rather
+  // than producing false confidence.
+  const misses = [];
+  for (const [path, value] of leafStrings(stringsFile)) {
+    if (path in COMPOSED_IN_SOURCE) continue; // proven by the check above
+    for (const fragment of value.split(/\{[a-z]+\}/i)) {
+      const needle = fragment.replace(/\s+/g, " ").trim();
+      if (needle.length < 8) continue;
+      if (!baselineUi.includes(needle)) misses.push(`${path}: ${JSON.stringify(needle)}`);
+    }
+  }
+  assert(
+    misses.length === 0,
+    `${misses.length} string(s) are not present in the baseline source:\n       ` +
+      misses.join("\n       "),
+  );
+});
+
+check("the history description's {count} matches the configured cap", () => {
+  // The original hard-coded the word "10" into this sentence while the cap
+  // itself lived in a `.slice(0, 10)`. They are now one value; assert the
+  // baseline's wording is still reproducible from it.
+  const rendered = stringsFile.history.description.replace(
+    "{count}",
+    String(configFile.limits.historyEntries),
+  );
+  assert(
+    baselineUi.includes(rendered.replace(/\s+/g, " ")),
+    `"${rendered}" does not match the sentence the baseline rendered`,
   );
 });
 

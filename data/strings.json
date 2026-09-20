@@ -1,0 +1,106 @@
+{
+  "$comment": "Every user-visible string in the interface, verbatim from the pre-refactor JSX. Copy edits — including the typos noted below — are made here, not in components. Curly apostrophes and the ellipsis character are intentional and reproduce the original rendering exactly.",
+
+  "brand": {
+    "name": "Clue-ai",
+    "tagline": "An AI that helps students troubleshoot assignments without directly giving the answer."
+  },
+
+  "toggles": {
+    "saveHistoryOn": "Saving on",
+    "saveHistoryOff": "Saving off",
+    "saveHistoryTitleOn": "Saving history is ON",
+    "saveHistoryTitleOff": "Saving history is OFF",
+    "themeLight": "Light mode",
+    "themeDark": "Dark mode",
+    "themeTitleToLight": "Switch to light mode",
+    "themeTitleToDark": "Switch to dark mode"
+  },
+
+  "subjectBar": {
+    "ariaLabel": "Choose subject mode",
+    "showMore": "More Subjects (Beta)",
+    "showLess": "Hide extra subjects"
+  },
+
+  "ask": {
+    "label": "What do you need help with?",
+    "placeholder": "Describe the bug, the goal, or what confuses you…"
+  },
+
+  "upload": {
+    "prompt": "Drag & drop or click to upload images",
+    "promptWithFile": "Upload More",
+    "selectedPrefix": "Selected: ",
+    "galleryAriaLabel": "Uploaded previews",
+    "removeTitle": "Remove",
+    "removeAriaLabelPrefix": "Remove ",
+    "thumbAltPrefix": "Uploaded ",
+    "legacyPreviewAlt": "Uploaded preview"
+  },
+
+  "actions": {
+    "$comment": "helpIdle/helpBusy swap on the same button while a request is in flight.",
+    "helpIdle": "Provide Guidance",
+    "helpBusy": "Thinking…",
+    "helpAriaLabel": "Get non-spoiler debugging help",
+    "helpTitle": "Non-spoiler debugging help",
+    "newPrompt": "New Prompt or Clear Existing Prompt and Response",
+    "newPromptTitle": "Clear current question and start fresh"
+  },
+
+  "response": {
+    "heading": "AI Response",
+    "$placeholderComment": "Rendered before the first request. `{subject}` is replaced with the active subject's shortLabel, lowercased — the original inlined `modeReadable(subjectMode).toLowerCase()` here.",
+    "placeholderLead": "Press {action} to start. I’ll analyze your {subject} work, images, and context and return coaching-only steps (no spoilers).",
+    "$placeholderBulletsComment": "\"a screenshots\" is a typo present in the shipped copy. It is reproduced verbatim so this extraction is a pure move; fix it here when you want the wording changed.",
+    "placeholderBullets": [
+      "Upload a screenshots of the assignment",
+      "Paste details or assignment instructions",
+      "Describe what you need help with"
+    ],
+    "errorPrefix": "Oops — ",
+    "$errorPrefixComment": "Prepended to a caught error's message; the fallback below is used when the API returns no text at all.",
+    "emptyResponseFallback": "Sorry, I couldn’t generate guidance this time."
+  },
+
+  "lineHints": {
+    "regionAriaLabel": "Highlighted code lines",
+    "heading": "Likely Error Lines",
+    "clear": "Clear",
+    "clearTitle": "Clear highlighted lines",
+    "locating": "Locating likely lines…",
+    "generating": "Generating guidance…",
+    "noRanges": "No line ranges returned.",
+    "failurePrefix": "Could not locate lines: ",
+    "failureFallback": "unknown error"
+  },
+
+  "history": {
+    "heading": "Past Questions",
+    "$descriptionComment": "`{count}` is the configured history cap from data/config.json (limits.historyEntries), which the original hard-coded as the word \"10\".",
+    "description": "Review the past {count} questions you had, what you uploaded, and how Clue-ai responded. Click on the box to see more details.",
+    "clear": "Clear History",
+    "clearTitle": "Clear saved history",
+    "noQuestion": "(No explicit question provided)",
+    "modeLabel": "Mode:",
+    "codeLabel": "Text submitted:",
+    "imagesAriaLabel": "Images used in this session",
+    "responseHeading": "AI Guidance",
+    "imageAltPrefix": "History image "
+  },
+
+  "footer": {
+    "text": "Built for students • Edison Law 2025 • San Ramon Valley Unified School District • v1.2.7"
+  },
+
+  "errors": {
+    "$comment": "Messages thrown client-side and returned by the API routes.",
+    "extractFailed": "Failed to extract code from image",
+    "noTextExtracted": "No text extracted from image",
+    "requestFailed": "Request failed",
+    "noImagesProvided": "No images provided",
+    "noTextExtractedServer": "No text extracted",
+    "unknownError": "Unknown error"
+  }
+}
