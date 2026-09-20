@@ -13,12 +13,17 @@ import { defineConfig } from "vitest/config";
  *   in the app but Vitest does not know about on its own.
  * - `environment: "jsdom"` is needed because the storage and theme helpers
  *   touch `window.localStorage` and `document.documentElement`.
+ * - `server-only` is stubbed. The real package throws unless the bundler
+ *   resolved it under Next's `react-server` condition, which is exactly the
+ *   guard we want in production builds; in tests it would simply make the
+ *   server modules unimportable. See tests/stubs/server-only.ts.
  */
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./", import.meta.url)),
+      "server-only": fileURLToPath(new URL("./tests/stubs/server-only.ts", import.meta.url)),
     },
   },
   test: {
