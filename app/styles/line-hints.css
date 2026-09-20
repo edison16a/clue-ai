@@ -1,18 +1,4 @@
 /* Line highlight overlay */
-.codeHighlightCard {
-  margin-top: 14px;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255,255,255,.08);
-  background: rgba(0,0,0,.18);
-  box-shadow: 0 8px 20px rgba(0,0,0,.35);
-}
-.codeHighlightHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
 .codeHighlightTitle {
   font-weight: 700;
   margin: 0;
@@ -130,23 +116,6 @@
   background: rgba(255, 193, 7, .14);
   border-left: 3px solid rgba(255, 193, 7, .6);
 }
-.codeHighlightEmpty {
-  margin-top: 10px;
-  color: rgb(var(--muted));
-  font-size: 13px;
-}
-.codeHighlightReasons {
-  margin: 10px 0 0;
-  padding-left: 16px;
-  color: rgb(var(--muted));
-  font-size: 13px;
-  display: grid;
-  gap: 4px;
-}
-.codeHighlightReasons strong {
-  color: rgb(var(--fg));
-}
-
 /* Make dropzone text match button typography */
 .dropzone .dzText,
 .dropzone .dzTextUploaded {
