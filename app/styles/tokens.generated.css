@@ -1,0 +1,65 @@
+/*
+ * GENERATED FILE — DO NOT EDIT.
+ *
+ * Produced from data/theme.json by scripts/generate-tokens.mjs.
+ * Run `npm run generate:tokens` after changing a colour.
+ *
+ * Block order is load-bearing: `:root` and the prefers-color-scheme
+ * override have identical specificity, so only source order decides
+ * between them. The `:root.theme-*` blocks carry an extra class and beat
+ * both wherever they sit, which is how the manual toggle overrides the
+ * operating system's preference.
+ */
+
+/* base — :root */
+:root {
+  --bg: 12 14 18;
+  --fg: 233 237 243;
+  --muted: 160 167 184;
+  --accent: 144 97 255;
+  --accent-2: 30 200 180;
+  --card: 18 20 26;
+  --card-2: 22 24 32;
+  --ring: 144 97 255 / 55%;
+  --shadow: 0 10px 30px rgba(0,0,0,.45);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
+  --font-system: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+/* systemLight — :root under @media (prefers-color-scheme: light) */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: 243 244 248;
+    --fg: 16 22 32;
+    --muted: 85 95 115;
+    --card: 255 255 255;
+    --card-2: 250 250 252;
+    --shadow: 0 10px 30px rgba(22, 26, 34, .12);
+  }
+}
+/* dark — :root.theme-dark */
+:root.theme-dark {
+  --bg: 12 14 18;
+  --fg: 233 237 243;
+  --muted: 160 167 184;
+  --accent: 144 97 255;
+  --accent-2: 30 200 180;
+  --card: 18 20 26;
+  --card-2: 22 24 32;
+  --ring: 144 97 255 / 55%;
+  --shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+/* light — :root.theme-light */
+:root.theme-light {
+  --bg: 245 246 250;
+  --fg: 18 24 38;
+  --muted: 110 120 140;
+  --accent: 234 179 8;
+  --accent-2: 252 211 77;
+  --card: 255 255 255;
+  --card-2: 248 249 252;
+  --ring: 234 179 8 / 55%;
+  --shadow: 0 10px 26px rgba(15, 23, 42, 0.14);
+}

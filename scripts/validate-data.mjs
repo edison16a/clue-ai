@@ -17,6 +17,8 @@ import { readFileSync } from "node:fs";
 import { extractSubjects } from "./extract-subjects.mjs";
 import { extractPrompts } from "./extract-prompts.mjs";
 import { extractUploads } from "./extract-uploads.mjs";
+import { extractTheme } from "./extract-theme.mjs";
+import { loadTheme, renderTokens } from "./generate-tokens.mjs";
 import { execFileSync } from "node:child_process";
 
 let failures = 0;
@@ -329,6 +331,84 @@ check("the locate prompt still documents the format the parser expects", () => {
     /-\s*\d+-\d+\s*\|/.test(locate),
     "locate prompt no longer shows the `- start-end | reason` bullet form",
   );
+});
+
+// ------------------------------------------------------------------- theme
+
+console.log("\ndata/theme.json");
+const themeFile = readData("theme.json");
+
+check("round-trips against the pre-refactor stylesheet", () => {
+  assertDeepEqual(
+    themeFile.palettes,
+    extractTheme().palettes,
+    "data/theme.json has drifted from the baseline globals.css",
+  );
+});
+
+check("palette order is preserved", () => {
+  // `base` must precede `systemLight`: they have identical specificity, so
+  // swapping them would make the dark defaults win under a light OS theme.
+  const order = Object.keys(themeFile.palettes);
+  assertDeepEqual(
+    order,
+    ["base", "systemLight", "dark", "light"],
+    "palette order changed, which changes which block the cascade picks",
+  );
+});
+
+check("every token value is non-empty and free of stray semicolons", () => {
+  for (const [key, block] of Object.entries(themeFile.palettes)) {
+    for (const [name, value] of Object.entries(block.tokens)) {
+      assert(value.length > 0, `${key}.${name} is empty`);
+      assert(!value.includes(";"), `${key}.${name} contains a semicolon: ${value}`);
+      assert(name.startsWith("--"), `${key}.${name} is not a custom property`);
+    }
+  }
+});
+
+check("the manual themes cover every colour the base palette defines", () => {
+  // A colour present in `base` but absent from `:root.theme-light` keeps its
+  // dark value when the user picks light mode — that is the class of bug this
+  // check exists to catch. Non-colour tokens (radii, fonts) are intentionally
+  // defined once, so they are excluded.
+  const nonColour = new Set(["--radius-lg", "--radius-md", "--radius-sm", "--font-system", "--font-mono"]);
+  const expected = Object.keys(themeFile.palettes.base.tokens).filter((t) => !nonColour.has(t));
+  for (const key of ["dark", "light"]) {
+    const missing = expected.filter((t) => !(t in themeFile.palettes[key].tokens));
+    assert(missing.length === 0, `palette "${key}" is missing ${missing.join(", ")}`);
+  }
+});
+
+console.log("\napp/styles/tokens.generated.css");
+
+check("is up to date with data/theme.json", () => {
+  const onDisk = readFileSync(
+    new URL("../app/styles/tokens.generated.css", import.meta.url),
+    "utf8",
+  );
+  assert(
+    onDisk === renderTokens(loadTheme()),
+    "the committed stylesheet is stale; run `npm run generate:tokens`",
+  );
+});
+
+check("declares exactly the values the baseline stylesheet declared", () => {
+  // Re-parse the generated CSS independently of the generator, so a bug in
+  // renderBlock() cannot make this check pass by agreeing with itself.
+  const css = readFileSync(
+    new URL("../app/styles/tokens.generated.css", import.meta.url),
+    "utf8",
+  );
+  const baseline = extractTheme().palettes;
+  for (const [key, block] of Object.entries(baseline)) {
+    for (const [name, value] of Object.entries(block.tokens)) {
+      assert(
+        css.includes(`${name}: ${value};`),
+        `generated CSS is missing "${name}: ${value};" from the ${key} palette`,
+      );
+    }
+  }
 });
 
 // ------------------------------------------------------------------ result
