@@ -1,0 +1,66 @@
+/* New Prompt button */
+/* === New Prompt button: styled like Help button but secondary === */
+.newPromptBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.16);
+  color: rgb(var(--fg));
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.15px;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+
+  /* 🔥 key changes */
+  order: 5;                 /* still after help/locate buttons */
+  grid-column: 1 / -1;      /* span full width of the grid */
+  width: 100%;              /* make it really wide */
+  margin-top: 8px;
+}
+
+
+
+.newPromptBtn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(144, 97, 255, 0.55);
+  background: rgba(144, 97, 255, 0.16);
+  box-shadow: 0 10px 22px rgba(144, 97, 255, 0.22);
+}
+
+.newPromptBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.newPromptBtn:disabled {
+  opacity: 0.65;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+/* mobile: full-width stack under Help button */
+@media (max-width: 640px) {
+  .newPromptBtn {
+    width: 100%;
+    justify-content: center;
+    grid-column: 1 / -1;
+    margin-top: 6px;
+  }
+}
+
+.newPromptIcon {
+  display: grid;
+  place-items: center;
+}

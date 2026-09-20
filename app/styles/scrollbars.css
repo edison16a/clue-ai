@@ -1,0 +1,20 @@
+/* Global scrollbars */
+/* === Global themed scrollbars (applies everywhere) === */
+
+/* Chrome / Edge / Safari */
+*::-webkit-scrollbar {
+  width: 10px;                  /* vertical scrollbar thickness */
+  height: 10px;                 /* horizontal scrollbar thickness */
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(185, 184, 189, 0.7) rgba(255,255,255,0.05);
+}

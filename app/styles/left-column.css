@@ -1,0 +1,136 @@
+/* Code box and drop zone */
+/* ---------- Left column ---------- */
+.left {
+  background: linear-gradient(180deg, rgba(var(--card), .9), rgba(var(--card-2), .9));
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  backdrop-filter: blur(10px);
+}
+
+.fieldGroup + .fieldGroup { margin-top: 14px; }
+
+.label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: rgb(var(--muted));
+  margin-bottom: 8px;
+}
+
+.codebox {
+  width: 100%;
+  min-height: 400px;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: rgb(var(--fg));
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .2s ease;
+}
+.codebox:focus {
+  border-color: color-mix(in oklab, rgb(var(--accent)) 55%, white);
+  box-shadow: 0 0 0 4px rgba(144,97,255,.18);
+  background: rgba(0,0,0,.32);
+}
+.codeboxWrap {
+  position: relative;
+}
+.codeOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(30,200,180,.4);
+  background: rgb(8 10 14);
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 6px;
+}
+.codeOverlayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Upload */
+.uploadRow {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 14px;
+}
+@media (max-width: 640px) {
+  .uploadRow { grid-template-columns: 1fr; }
+}
+
+.dropzone {
+  align-items: center;
+  display: block;
+  border: 1.5px dashed rgba(255,255,255,.18);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+  background: rgba(0,0,0,.2);
+  color: rgb(var(--fg));  
+  cursor: pointer;
+  transition: border-color .15s ease, background .2s ease, transform .08s ease;
+  user-select: none;
+}
+.dropzone:hover {
+  border-color: rgba(144,97,255,.6);
+  background: rgba(144,97,255,.08);
+}
+.dropzone:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(144,97,255,.22);
+  transform: translateY(-1px);
+}
+/* Center the uploaded state text/icon inside the dropzone */
+.dropzone.hasFile .dzInner {
+  width: 100%;
+  justify-content: center;   /* horizontal centering */
+  text-align: center;
+  align-items: center;
+}
+/* Optional: keep default (no-file) state left-aligned */
+.dzInner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  /* no justify-content here so default remains left */
+}
+
+.dzInner svg { opacity: .9; }
+.fileNote {
+  margin-left: auto;
+  font-style: normal;
+  font-weight: 500;
+  color: rgb(var(--fg));
+  opacity: .7;
+  font-size: 12px;
+}
+.hiddenFile { display: none; }
+
+.thumb {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.08);
+  display: grid;
+  place-items: center;
+}
+.thumb img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  max-height: 110px;
+}

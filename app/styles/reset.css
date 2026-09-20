@@ -1,0 +1,10 @@
+/* Reset and element defaults */
+/* app/globals.css */
+
+/* ---------- CSS Reset-ish ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body, h1, h2, p, ul, li { margin: 0; padding: 0; }
+img { display: block; max-width: 100%; height: auto; }

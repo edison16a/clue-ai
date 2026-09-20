@@ -1,0 +1,198 @@
+/* Upload row, thumbnails, ask input */
+/* --- Help button layout next to upload --- */
+/* --- Upload row now: [dropzone][thumb][help] --- */
+.uploadRow {
+  display: grid;
+  grid-template-columns: 1fr 120px auto; /* Upload | Preview | Help */
+  gap: 12px;
+  align-items: stretch;
+}
+
+/* Control order without changing JSX */
+.dropzone { order: 1; }
+.thumb    { order: 2; }
+.helpBtn  { order: 3; }
+
+/* Preview box sizing next to button */
+.thumb {
+  width: 120px;
+  max-height: 110px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.08);
+  display: grid;
+  place-items: center;
+}
+.thumb img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Swap button text on upload */
+.dzTextUploaded { display: none; }
+.dropzone.hasFile .dzText { display: none; }            /* hide default */
+.dropzone.hasFile .dzTextUploaded { display: inline; }  /* show "File uploaded" */
+.dropzone.hasFile .fileNote { display: none; }          /* hide filename detail */
+
+/* Mobile: stack gracefully */
+@media (max-width: 640px) {
+  .uploadRow { grid-template-columns: 1fr; }
+  .thumb { width: 100%; max-height: 180px; }
+}
+
+
+/* Help button */
+.helpBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,.12);
+  background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.28));
+  color: rgb(var(--fg));
+  font-weight: 700;
+  letter-spacing: .2px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  white-space: nowrap;
+}
+.helpBtn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(144,97,255,.55);
+  background: linear-gradient(180deg, rgba(144,97,255,.14), rgba(144,97,255,.10));
+  box-shadow: 0 10px 22px rgba(144,97,255,.22);
+}
+.helpBtn:active { transform: translateY(0); }
+.helpBtn svg { opacity: .9; }
+
+/* Stack on small screens */
+@media (max-width: 640px) {
+  .uploadRow {
+    grid-template-columns: 1fr; /* drop to one column */
+  }
+  .helpBtn {
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+
+/* === Optional help input styling === */
+.askInput {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(0,0,0,.22);
+  color: rgb(var(--fg));
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .2s ease;
+}
+.askInput:focus {
+  border-color: color-mix(in oklab, rgb(var(--accent)) 55%, white);
+  box-shadow: 0 0 0 4px rgba(144,97,255,.18);
+  background: rgba(0,0,0,.28);
+}
+
+/* === Upload row tweaks: [dropzone][thumbs][help] === */
+.uploadRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto; /* Upload | Previews | Help */
+  gap: 12px;
+  align-items: stretch;
+}
+
+/* order without changing JSX */
+.dropzone  { order: 1; min-height: 90px; display: flex; align-items: center; } /* ensure vertical baseline */
+.thumbs    { order: 2; }
+.helpBtn   { order: 3; }
+.thumb     { order: 2; } /* legacy single preview */
+
+/* center contents when file exists */
+.dzInner {
+  display: flex;
+  flex-direction: row;    /* icon above text */
+  gap: 8px;
+  align-items: center;       /* horizontal centering */
+  justify-content: center;   /* vertical centering */
+  text-align: center;        /* center text lines */
+  width: 100%;
+  height: 100%;
+}
+
+.dropzone.hasFile .dzInner {
+  justify-content: center;   /* horizontal centering (uploaded state) */
+  align-items: center;        /* vertical centering */
+  text-align: center;
+}
+
+/* hide filename & swap button text after upload */
+.dzTextUploaded { display: none; }
+.dropzone.hasFile .dzText { display: none; }
+.dropzone.hasFile .dzTextUploaded { display: inline; }
+.dropzone.hasFile .fileNote { display: none; }
+
+/* previews gallery */
+.thumbs {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  max-width: clamp(120px, 28vw, 360px);
+  overflow-x: auto;
+  padding: 6px 2px;
+}
+
+/* each thumb with close button */
+.thumbItem {
+  position: relative;
+  width: 120px;
+  height: 110px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.08);
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+.thumbItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumbClose {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  line-height: 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.28);
+  background: rgba(0,0,0,.55);
+  color: rgb(var(--fg));
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.thumbClose:hover {
+  background: rgba(144,97,255,.55);
+  border-color: rgba(144,97,255,.75);
+}
+
+/* when gallery is present, hide legacy single-thumb block (kept in JSX) */
+.uploadRow.hasGallery .thumb { display: none; }
+
+/* mobile */
+@media (max-width: 640px) {
+  .uploadRow { grid-template-columns: 1fr; }
+  .thumbs { max-width: 100%; }
+  .helpBtn { width: 100%; justify-content: center; }
+}
