@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/.vitest
+/test-results
 
 # next.js
 /.next/
@@ -19,9 +21,9 @@
 
 # production
 /build
+/dist
 
 # misc
-.DS_Store
 *.pem
 
 # debug
@@ -29,9 +31,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+logs
+*.log
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +44,31 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# OS cruft — these get created by Finder/Explorer just by browsing the repo,
+# so they are committed by accident unless they are ignored up front.
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Per-user editor and IDE state. These record one developer's open tabs,
+# breakpoints and local run configs; they are machine-specific and cause
+# pointless merge conflicts when shared.
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+*.swp
+*.swo
+*~
+.history/
+
+# Stray backup/patch files left behind by editors and merge tools
+*.bak
+*.orig
+*.rej
