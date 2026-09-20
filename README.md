@@ -2,18 +2,18 @@
 
 [https://clue-ai.vercel.app/](https://clue-ai.vercel.app/)
 
-Clue.ai is an AI-powered learning assistant built to help students troubleshoot assignments **without ever spoiling the answer**.
+Clue.ai is an AI learning assistant that helps students troubleshoot assignments **without spoiling the answer**.
 
-Think of it as that supportive teacher who nudges you in the right direction, asks good questions, and helps you figure things out on your own. Instead of dumping a solution, Clue.ai guides you step by step so you actually learn the reasoning process.
+It works like a teacher who nudges you in the right direction and asks good questions instead of handing over a solution, so you actually learn the reasoning.
 
 ---
 
 ## ✨ What it does
 
-* 📄 **Paste your assignment** — share any snippet you're stuck on.
-* 🖼️ **Upload images and screenshots** — questions, diagrams, lab prompts, or assignment screenshots. Source files can be dropped straight into the text box.
-* 💬 **Describe your problem** — tell Clue.ai what confuses you, or just say "help debug".
-* 🤖 **Get coaching, not answers** — the AI responds with hints, highlights the lines worth checking, asks clarifying questions, and suggests problem-solving strategies.
+* 📄 **Paste your assignment.** Any snippet you're stuck on.
+* 🖼️ **Upload images and screenshots.** Questions, diagrams, lab prompts. You can also drop source files straight into the text box.
+* 💬 **Describe your problem.** Tell Clue.ai what confuses you, or just say "help debug".
+* 🤖 **Get coaching, not answers.** You get hints, the lines worth checking, and clarifying questions.
 
 ---
 
@@ -34,85 +34,79 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-`OPENAI_API_KEY` is the only environment variable. It is read server-side only and never reaches the browser.
+`OPENAI_API_KEY` is the only environment variable. It is read on the server and never reaches the browser.
 
 ### Commands
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Development server with hot reload |
+| `npm run dev` | Dev server with hot reload |
 | `npm run build` | Production build |
 | `npm start` | Serve a production build |
-| `npm test` | Run the test suite |
+| `npm test` | Run the tests |
 | `npm run test:watch` | Re-run tests on change |
 | `npm run test:coverage` | Tests with a coverage report |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run validate:data` | Check every file in `data/` |
-| `npm run generate:tokens` | Rebuild the CSS colour tokens from `data/theme.json` |
-| `npm run verify` | All of the above checks, in one command |
+| `npm run generate:tokens` | Rebuild the CSS colours from `data/theme.json` |
+| `npm run verify` | Typecheck, data checks, stylesheet check and tests |
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ How it's organised
 
-The app is a single page backed by three API routes. Content lives in `data/`, logic in `lib/`, and rendering in `app/`.
+One page, three API routes. Content lives in `data/`, logic in `lib/`, rendering in `app/`.
 
 ```
-data/                      Content and configuration. No code.
-  subjects.json              The five subject modes and all of their copy
+data/                      Content and config. No code.
+  subjects.json              The subject modes and all their copy
   strings.json               Every user-visible string
   uploads.json               Accepted file extensions
   config.json                Models, limits, storage keys, defaults
-  theme.json                 Colour palettes for dark and light
-  prompts/                   The AI system prompts, as Markdown
+  theme.json                 Colours for dark and light
+  prompts/                   The AI prompts, as Markdown
     help.md  locate.md  extract.md
 
 lib/                       Logic. No JSX, no fetch.
-  types.ts                   Shared types and API contracts
   subjects.ts                The subject registry
-  locator.ts                 Parses the locator's reply into line ranges
+  locator.ts                 Parses the locator reply into line ranges
   numbering.ts               Renders a submission as a numbered listing
   fences.ts                  Strips Markdown fences from transcribed code
   uploads.ts                 Accept attribute and text-file detection
-  history.ts                 History records and the entry cap
-  storage.ts                 Guarded localStorage access
+  history.ts, storage.ts     History records and guarded localStorage
+  types.ts                   Shared types and API contracts
   hooks/                     useTheme, useHistory
-  server/                    Server-only modules
-    openai.ts                  The shared OpenAI client
-    prompts.ts                 Loads data/prompts/*.md at runtime
-    services.ts                Prompt assembly and the three model calls
-    http.ts                    JSON response helpers
+  server/                    OpenAI client, prompt loader, the three
+                             model calls, response helpers
 
 app/
-  page.tsx                   Route entry; renders the workspace
-  layout.tsx                 Document shell
-  globals.css                Stylesheet entry point — import order is the cascade
-  styles/                    Fifteen per-feature stylesheets, plus generated tokens
+  page.tsx, layout.tsx       Route entry and document shell
+  globals.css                Stylesheet entry. Import order is the cascade.
+  styles/                    Per-feature stylesheets
   components/                UI, one file per piece of the screen
-  api/
-    help/     locate/     extract/      Thin HTTP adapters
+  api/help, api/locate, api/extract    Thin HTTP adapters
 
 scripts/                   Extraction and validation tooling
 tests/                     Vitest suites
 ```
 
-### How the two requests fit together
+### How a request works
 
 Pressing **Provide Guidance** runs up to three calls:
 
-1. **`POST /api/extract`** — only when images are attached *and* the text box is empty. Transcribes the screenshots, preserving the student's mistakes rather than correcting them. If you pasted code *and* attached a screenshot, your paste is treated as the submission and is never overwritten.
-2. **`POST /api/help`** — returns the coaching hints shown in the right-hand panel.
-3. **`POST /api/locate`** — returns line ranges as plain text, which the browser parses into the highlight overlay.
+1. `POST /api/extract` runs only when images are attached and the text box is empty. It transcribes the screenshots and keeps the student's mistakes instead of fixing them. If you paste code and also attach a screenshot, your paste is used and never overwritten.
+2. `POST /api/help` returns the hints shown in the right-hand panel.
+3. `POST /api/locate` returns line ranges as plain text, which the browser turns into the highlight overlay.
 
-The locate reply is deliberately plain text rather than JSON. `lib/locator.ts` tolerates a missing header, a chatty preamble or an odd dash, so a formatting slip degrades to fewer highlights instead of failing outright.
+The locate reply is plain text rather than JSON on purpose. `lib/locator.ts` copes with a missing header or an odd dash, so a formatting slip means fewer highlights instead of a failed request.
 
-`lib/numbering.ts` and `lib/locator.ts` are two halves of one contract: the route numbers the lines the model sees, and the browser numbers the lines it highlights. If those ever disagree, every highlight silently lands on the wrong row — which is why they sit side by side and are tested together.
+`lib/numbering.ts` numbers the lines the model sees and `lib/locator.ts` numbers the lines the browser highlights. If those disagree every highlight lands on the wrong row and nothing errors, so they sit next to each other and are tested together.
 
 ---
 
-## 📝 Adding things without writing code
+## 📝 Changing things without writing code
 
-Everything below is a `data/` edit. Run `npm run validate:data` afterwards; it will tell you if something is missing or inconsistent.
+Everything here is a `data/` edit. Run `npm run validate:data` afterwards and it will tell you if something is missing or inconsistent.
 
 ### Add a subject
 
@@ -132,62 +126,56 @@ Append an object to `subjects` in `data/subjects.json`:
 }
 ```
 
-| Field | Where it appears |
+| Field | Where it shows up |
 | --- | --- |
-| `id` | Sent to the API, stored in history. Lowercase, no spaces. |
+| `id` | Sent to the API and stored in history. Lowercase, no spaces. |
 | `label` | The full name on the subject chip |
-| `shortLabel` | The history tag, and the empty-state sentence |
-| `apiLabel` | The name given to the AI in the prompt |
+| `shortLabel` | The history tag and the empty-state sentence |
+| `apiLabel` | The name the AI is given in the prompt |
 | `hint` | Badge text on the chip. Use `""` for no badge. |
 | `codeLabel` | Heading above the text box |
 | `codePlaceholder` | Placeholder inside the text box |
 | `uploadAriaLabel` | Accessible name for the file input |
 | `icon` | `{"kind": "glyph", "value": "📜"}` for a character, or `{"kind": "component", "value": "code"}` for an SVG from `app/components/Icons.tsx` |
 
-The chip, the labels, the prompt wording and the history tag all follow automatically. Only the first subject in the list is shown before "More Subjects" is expanded.
+The chip, the labels, the prompt wording and the history tag all follow from this. Only the first subject in the list shows before "More Subjects" is expanded.
 
 ### Change wording
 
-Edit `data/strings.json`. `{action}`, `{subject}` and `{count}` are substituted at render time; leave them in place.
+Edit `data/strings.json`. Leave `{action}`, `{subject}` and `{count}` in place, they get filled in at render time.
 
-### Change the AI's behaviour
+### Change what the AI does
 
-Edit the Markdown in `data/prompts/`. They are read from disk at runtime, so no code change is involved.
+Edit the Markdown in `data/prompts/`. These are read from disk at runtime, so there is no code change involved.
 
-Be careful with `locate.md`: its `LINES:` / `- start-end | reason` / `NOTE:` format is what `lib/locator.ts` parses. A test asserts the format is still documented there.
+Be careful with `locate.md`. Its `LINES:` and `- start-end | reason` and `NOTE:` format is what `lib/locator.ts` parses. A test checks the format is still documented there.
 
 ### Accept another file type
 
-Add the bare extension — no leading dot — to `textExtensions` in `data/uploads.json`. It feeds both the file picker's `accept` attribute and the drop handler's detection, so the two cannot drift apart.
+Add the extension without a leading dot to `textExtensions` in `data/uploads.json`. It feeds both the file picker and the drop handler, so the two cannot drift apart.
 
 ### Change colours
 
-Edit `data/theme.json`, then run `npm run generate:tokens` to rebuild `app/styles/tokens.generated.css`. Do not edit the generated file; `npm run validate:data` fails if it is stale.
+Edit `data/theme.json`, then run `npm run generate:tokens`. Don't edit `app/styles/tokens.generated.css` directly, `npm run validate:data` fails if it is stale.
 
-The four palettes are ordered, and the order matters. `base` and `systemLight` have equal CSS specificity, so only source order separates them. The `theme-dark` and `theme-light` blocks carry an extra class and win from anywhere, which is how the manual toggle overrides the operating system's preference.
+The four palettes are in a deliberate order. `base` and `systemLight` have equal CSS specificity, so only source order separates them. The `theme-dark` and `theme-light` blocks carry an extra class and win from anywhere, which is how the manual toggle beats the OS setting.
 
 ### Change a model or a limit
 
-Edit `data/config.json`: models and retention per endpoint, the prompt truncation cap, the history cap, the localStorage key names, and the startup defaults.
+Edit `data/config.json`. It holds the model and retention flag per endpoint, the prompt truncation cap, the history cap, the localStorage key names, and the startup defaults.
 
 ---
 
-## 🧰 Tooling notes
+## 🧰 Scripts
 
-`scripts/` holds the tools that made this structure trustworthy and keep it that way:
-
-* **`extract-*.mjs`** — the one-shot extractors that pulled the subjects, prompts, upload types and colours out of the original source. They read from git rather than the working tree, so `validate-data.mjs` can re-run them forever as a regression check that the data still matches what the app originally rendered.
-* **`validate-data.mjs`** — 26 checks over `data/`: shapes, uniqueness, cross-file references, and round-trips against the original source.
-* **`generate-tokens.mjs`** — `data/theme.json` → CSS custom properties.
-* **`verify-stylesheet.mjs`** — flattens the stylesheets to a (media query, selector, property) → winning value map and diffs it against the original single-file stylesheet, proving the split changed no declaration.
-* **`split-stylesheet.mjs`** — the one-shot splitter, kept for reference.
+`validate-data.mjs` runs 26 checks over `data/`, including round-trips against the original source. `verify-stylesheet.mjs` diffs the split stylesheets against the original single file. `generate-tokens.mjs` turns `data/theme.json` into CSS. The `extract-*.mjs` scripts are the one-shot tools that pulled the data out of the source in the first place, kept because the validator re-runs them.
 
 ---
 
 ## 🛠️ Built with
 
-Next.js 15 (App Router) · React 19 · TypeScript · OpenAI Responses API · Vitest
+Next.js 15 (App Router), React 19, TypeScript, the OpenAI Responses API, and Vitest.
 
 ---
 
-Built for students • Edison Law 2025 • San Ramon Valley Unified School District
+Built for students by Edison Law, 2025. San Ramon Valley Unified School District.
