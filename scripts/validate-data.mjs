@@ -90,6 +90,30 @@ check("every subject carries every field", () => {
   }
 });
 
+check("every subject has a drawable icon", () => {
+  for (const subject of subjectsFile.subjects) {
+    const icon = subject.icon;
+    assert(icon && typeof icon === "object", `subject "${subject.id}" has no icon`);
+    assert(
+      icon.kind === "glyph" || icon.kind === "component",
+      `subject "${subject.id}" has unknown icon kind ${JSON.stringify(icon.kind)}`,
+    );
+    assert(
+      typeof icon.value === "string" && icon.value.length > 0,
+      `subject "${subject.id}" has an empty icon value`,
+    );
+    // A component icon names a key in the registry in app/components/Icons.tsx.
+    // A missing name renders nothing at all, silently, so bind the two here.
+    if (icon.kind === "component") {
+      assert(
+        ["code"].includes(icon.value),
+        `subject "${subject.id}" names icon component "${icon.value}", ` +
+          "which app/components/Icons.tsx does not export",
+      );
+    }
+  }
+});
+
 check("subject ids are unique and id-shaped", () => {
   const seen = new Set();
   for (const { id } of subjectsFile.subjects) {

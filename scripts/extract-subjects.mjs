@@ -137,6 +137,35 @@ function parseApiLabels(source) {
   return labels;
 }
 
+/**
+ * Extracts each subject chip's icon from the per-mode JSX blocks.
+ *
+ * The original rendered these as five sibling `{mode.id === "x" && (...)}`
+ * expressions. Four contained a single character — "∆", an emoji — and one
+ * contained an inline <svg>. The distinction is preserved as a `kind` rather
+ * than flattened, because a glyph is content (it can be swapped by editing
+ * JSON) while the SVG is a component that must inherit `currentColor` to
+ * recolour with the theme.
+ */
+function parseIcons(source) {
+  const icons = {};
+  const blockRe = /mode\.id === "(\w+)" && \(\s*([\s\S]*?)\n\s*\)\}/g;
+
+  for (const [, id, block] of source.matchAll(blockRe)) {
+    if (block.includes("<svg")) {
+      icons[id] = { kind: "component", value: "code" };
+      continue;
+    }
+    // A glyph block is `<span ...>` / glyph / `</span>` across three lines;
+    // the glyph is whatever sits between the tags.
+    const glyph = block.match(/>\s*([^<>\s]+)\s*<\/span>/);
+    if (!glyph) throw new Error(`Could not read the icon glyph for "${id}"`);
+    icons[id] = { kind: "glyph", value: glyph[1] };
+  }
+
+  return icons;
+}
+
 export function extractSubjects() {
   const page = readBaseline("app/page.tsx");
   const helpRoute = readBaseline("app/api/help/route.ts");
@@ -147,6 +176,7 @@ export function extractSubjects() {
   const codePlaceholder = parseTernaryChain(page, "codePlaceholder");
   const uploadAriaLabel = parseTernaryChain(page, "uploadAriaLabel");
   const shortLabel = parseModeReadable(page);
+  const icons = parseIcons(page);
   const apiLabels = parseApiLabels(helpRoute);
 
   // The two routes each carried their own copy of the map. Extraction is only
@@ -160,6 +190,10 @@ export function extractSubjects() {
           `${JSON.stringify(apiLabels[id])} vs ${JSON.stringify(locateLabels[id])}`,
       );
     }
+  }
+
+  for (const id of ORDER) {
+    if (!icons[id]) throw new Error(`No chip icon found for subject "${id}"`);
   }
 
   const found = Object.keys(modes);
@@ -182,6 +216,7 @@ export function extractSubjects() {
       codeLabel: codeLabel[id],
       codePlaceholder: codePlaceholder[id],
       uploadAriaLabel: uploadAriaLabel[id],
+      icon: icons[id],
     })),
   };
 }

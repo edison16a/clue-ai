@@ -9,7 +9,11 @@
       "hint": "",
       "codeLabel": "Paste your code",
       "codePlaceholder": "// Paste your Java, Python, JS, etc.\n// Attach pictures if needed.",
-      "uploadAriaLabel": "Upload image of your assignment or error"
+      "uploadAriaLabel": "Upload image of your assignment or error",
+      "icon": {
+        "kind": "component",
+        "value": "code"
+      }
     },
     {
       "id": "math",
@@ -19,7 +23,11 @@
       "hint": "BETA",
       "codeLabel": "Paste your math problem",
       "codePlaceholder": "// Paste the full math problem or system here.\n// You can also attach a screenshot of the question.",
-      "uploadAriaLabel": "Upload image of your math problem or work"
+      "uploadAriaLabel": "Upload image of your math problem or work",
+      "icon": {
+        "kind": "glyph",
+        "value": "∆"
+      }
     },
     {
       "id": "science",
@@ -29,7 +37,11 @@
       "hint": "BETA",
       "codeLabel": "Paste your science question or lab instructions",
       "codePlaceholder": "// Paste the question, lab write-up, or data snippet.\n// Attach images of diagrams or lab setups if helpful.",
-      "uploadAriaLabel": "Upload image of your diagram, data table, or lab prompt"
+      "uploadAriaLabel": "Upload image of your diagram, data table, or lab prompt",
+      "icon": {
+        "kind": "glyph",
+        "value": "🧪"
+      }
     },
     {
       "id": "english",
@@ -39,7 +51,11 @@
       "hint": "BETA",
       "codeLabel": "Paste the passage, prompt, or outline",
       "codePlaceholder": "// Paste the prompt, passage, or outline you're working on.\n// Attach screenshots of the rubric or prompt if needed.",
-      "uploadAriaLabel": "Upload image of your prompt, passage, or rubric"
+      "uploadAriaLabel": "Upload image of your prompt, passage, or rubric",
+      "icon": {
+        "kind": "glyph",
+        "value": "📖"
+      }
     },
     {
       "id": "other",
@@ -49,7 +65,11 @@
       "hint": "BETA",
       "codeLabel": "Paste your assignment details",
       "codePlaceholder": "// Paste any instructions or content you're stuck on.\n// Attach screenshots or images if they help explain the task.",
-      "uploadAriaLabel": "Upload image related to your assignment"
+      "uploadAriaLabel": "Upload image related to your assignment",
+      "icon": {
+        "kind": "glyph",
+        "value": "❔"
+      }
     }
   ]
 }

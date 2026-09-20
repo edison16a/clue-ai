@@ -20,6 +20,18 @@ import subjectsData from "@/data/subjects.json";
  */
 export type SubjectId = (typeof subjectsData.subjects)[number]["id"];
 
+/**
+ * How a subject chip's icon is drawn.
+ *
+ * "glyph" is a character rendered as text and is pure content — swap it by
+ * editing the JSON. "component" names an entry in the icon registry, used
+ * where the icon must be an SVG that inherits `currentColor` so it recolours
+ * with the theme and with button states.
+ */
+export type SubjectIcon =
+  | { readonly kind: "glyph"; readonly value: string }
+  | { readonly kind: "component"; readonly value: string };
+
 /** Everything the UI and the prompts need to know about one subject. */
 export interface Subject {
   /** Stable slug; sent to the API and stored in history records. */
@@ -38,6 +50,8 @@ export interface Subject {
   readonly codePlaceholder: string;
   /** Accessible name for the file input, phrased for this subject. */
   readonly uploadAriaLabel: string;
+  /** The chip's icon. */
+  readonly icon: SubjectIcon;
 }
 
 /** The two themes the stylesheet defines. Not derived from the OS preference. */
