@@ -94,15 +94,23 @@ export function ClueWorkspace() {
     });
   };
 
+  /**
+   * Drops one attachment, keeping the drop zone's label in step.
+   *
+   * The next array is computed before any state is set. Previously the two
+   * dependent updates were issued from *inside* the `setImages` updater,
+   * which React requires to be a pure function of its argument: it is free to
+   * call an updater more than once — it does exactly that under StrictMode in
+   * development — and to discard the result, so those nested updates could run
+   * twice or against a state React then threw away.
+   */
   const removeImage = (index: number) => {
-    setImages((previous) => {
-      const next = previous.filter((_, i) => i !== index);
-      if (index === 0) {
-        setImagePreview(next[0]?.src ?? null);
-        setImageName(next[0]?.name ?? "");
-      }
-      return next;
-    });
+    const next = images.filter((_, i) => i !== index);
+    setImages(next);
+    if (index === 0) {
+      setImagePreview(next[0]?.src ?? null);
+      setImageName(next[0]?.name ?? "");
+    }
   };
 
   /** Transcribes uploaded screenshots into text. Throws on any failure. */
