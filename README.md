@@ -1,5 +1,6 @@
 # Clue.ai 🎓💡
 
+**Project Discontinued:**
 [https://clue-ai.vercel.app/](https://clue-ai.vercel.app/)
 
 Clue.ai is an AI learning assistant that helps students troubleshoot assignments **without spoiling the answer**.
@@ -19,8 +20,7 @@ It works like a teacher who nudges you in the right direction and asks good ques
 
 ## 🚀 Screenshots
 
-<img width="1912" height="1636" alt="Clue.ai main interface" src="https://github.com/user-attachments/assets/529c01b7-aac6-44e6-af02-07992cd01ab2" />
-<img width="1176" height="577" alt="Clue.ai guidance panel" src="https://github.com/user-attachments/assets/be9697fc-ead9-4fe0-b26c-bdd801c95c60" />
+<img width="1103" height="851" alt="image" src="https://github.com/user-attachments/assets/cf56f87b-4052-4e0c-baed-07e39484a3f7" />
 
 ---
 
