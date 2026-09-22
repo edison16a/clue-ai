@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/**/*": ["./data/prompts/**/*"],
   },
+
+  /**
+   * Hides the floating Next.js button in the bottom corner during `next dev`.
+   * It only ever showed an issue count over the page and has no place in
+   * what the app looks like.
+   */
+  devIndicators: false,
 };
 
 export default nextConfig;
