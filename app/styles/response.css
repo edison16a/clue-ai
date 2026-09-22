@@ -1,5 +1,4 @@
 /* AI response panel */
-/* ---------- Right column (AI) ---------- */
 .right {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -15,7 +14,7 @@
 .aiHeader h2 {
   font-size: 15px;
   font-weight: 700;
-  color: rgb(var(--muted));
+  color: var(--muted);
   letter-spacing: .3px;
   text-transform: uppercase;
 }
@@ -23,18 +22,18 @@
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: rgb(var(--accent));
-  box-shadow: 0 0 0 0 rgba(144,97,255,.7);
+  background: var(--accent);
+  box-shadow: 0 0 0 0 var(--accent-ring);
   animation: ping 1.4s infinite;
 }
 @keyframes ping {
-  0% { box-shadow: 0 0 0 0 rgba(144,97,255,.7); }
-  100% { box-shadow: 0 0 0 12px rgba(144,97,255,0); }
+  0% { box-shadow: 0 0 0 0 var(--accent-ring); }
+  100% { box-shadow: 0 0 0 12px transparent; }
 }
 
 .aiCard {
-  background: linear-gradient(180deg, rgba(var(--card), .95), rgba(var(--card-2), .95));
-  border: 1px solid rgba(255,255,255,.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   min-height: 260px;
@@ -42,37 +41,32 @@
   overflow: hidden;
 }
 
-/* Make the AI text container tight and readable */
 .aiText {
-  /* remove any default top/bottom gap from the container itself */
-  margin: 0;                         /* ✅ kill container margin */
+  margin: 0;
   font-family: var(--font-system);
   font-size: 14.5px;
   line-height: 1.7;
 }
-
-/* Remove the “mystery” top space that often comes from the first child’s margin */
-.aiText > :first-child {             /* ✅ prevents first paragraph’s top margin from creating a gap */
+/* The first paragraph's top margin would otherwise open a gap under the header. */
+.aiText > :first-child {
   margin-top: 0 !important;
 }
-
-/* Nice defaults for markdown elements */
 .aiText p { margin: 0.5em 0; }
 .aiText ul, .aiText ol { margin: 0.5em 0 0.5em 1.25em; }
 .aiText code,
 .historyResponseText code {
   font-family: var(--font-mono);
   font-size: 0.95em;
-  background: rgba(249, 243, 243, 0.12);       /* lighter for readability in dark mode */
-  border: 1px solid rgba(255,255,255,.18);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   padding: 0.12em 0.38em;
   border-radius: 6px;
 }
 .aiText pre {
-  margin: 0.75em 0;                  /* tighter than browser default */
+  margin: 0.75em 0;
   padding: 10px 12px;
-  background: rgba(255,255,255,.07);       /* lighter block for dark mode */
-  border: 1px solid rgba(255,255,255,.16);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: auto;
 }
@@ -81,11 +75,13 @@
   border: 0;
   padding: 0;
 }
+.aiText a, .historyResponseText a { color: var(--accent-text); }
 
 .placeholder {
-  color: rgb(var(--muted));
+  color: var(--muted);
   font-size: 14.5px;
 }
+.placeholder strong { color: var(--fg); }
 .placeholder ul {
   margin-top: 8px;
   padding-left: 18px;

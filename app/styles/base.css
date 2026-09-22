@@ -1,8 +1,7 @@
 /* Page background and body */
-/* ---------- Base ---------- */
 body.root {
-  color: rgb(var(--fg));
-  background: rgb(var(--bg));
+  color: var(--fg);
+  background: var(--bg);
   font-family: var(--font-system);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -10,19 +9,15 @@ body.root {
   overflow-x: hidden;
 }
 
-/* Subtle animated gradient background */
-.bg-gradient {
-  position: fixed;
-  inset: -10%;
-  background:
-    radial-gradient(60% 40% at 20% 10%, rgba(144,97,255,.18), transparent 60%),
-    radial-gradient(50% 35% at 85% 15%, rgba(30,200,180,.18), transparent 60%),
-    radial-gradient(45% 40% at 60% 85%, rgba(144,97,255,.12), transparent 60%);
-  filter: blur(40px) saturate(120%);
-  pointer-events: none;
-  animation: float 24s ease-in-out infinite alternate;
-}
-@keyframes float {
-  0% { transform: translateY(-2%) translateX(-1%); }
-  100% { transform: translateY(2%) translateX(1%); }
+/*
+ * Shared focus treatment. Every interactive control gets the same ring so
+ * keyboard users can always find where they are, whatever the theme.
+ */
+button:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-ring);
 }

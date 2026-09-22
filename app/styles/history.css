@@ -1,5 +1,4 @@
 /* Past questions section */
-/* === History / Past sessions section === */
 .history {
   max-width: 1200px;
   margin: 26px auto 0;
@@ -11,22 +10,18 @@
   justify-content: space-between;
   gap: 10px;
 }
-
 .historyHeader h2 {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgb(var(--muted));
+  color: var(--muted);
 }
-
 .historyHeader p {
   margin-top: 4px;
   font-size: 13px;
-  color: rgba(var(--muted), 0.95);
+  color: var(--muted);
 }
-
-/* NEW: wrap text so it can flex next to the button */
 .historyHeaderText {
   flex: 1;
   min-width: 0;
@@ -39,15 +34,15 @@
   gap: 6px;
   padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(0, 0, 0, 0.18);
-  color: rgb(var(--fg));
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16px;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-sm);
   transition:
     transform 0.08s ease,
     box-shadow 0.2s ease,
@@ -55,31 +50,25 @@
     background 0.2s ease,
     color 0.2s ease;
 }
-
 .clearHistoryBtn:hover {
   transform: translateY(-1px);
-  border-color: rgba(144, 97, 255, 0.55);
-  background: rgba(144, 97, 255, 0.16);
-  box-shadow: 0 10px 22px rgba(144, 97, 255, 0.22);
+  border-color: var(--border-strong);
+  background: var(--surface-3);
 }
-
 .clearHistoryBtn:active {
   transform: translateY(0);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
 }
-
 .clearHistoryBtn:disabled {
   opacity: 0.65;
   cursor: default;
   transform: none;
   box-shadow: none;
 }
-
 .clearHistoryIcon {
   display: grid;
   place-items: center;
+  color: var(--muted);
 }
-
 
 .historyList {
   margin-top: 12px;
@@ -88,19 +77,17 @@
   gap: 10px;
 }
 
-/* Use <details> as collapsible cards */
+/* Each entry is a <details> card. */
 .historyItem {
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(var(--card), 0.96), rgba(var(--card-2), 0.96));
+  border: 1px solid var(--border);
+  background: var(--surface);
   box-shadow: var(--shadow);
   overflow: hidden;
 }
-
 .historyItem[open] {
-  border-color: rgba(144, 97, 255, 0.6);
+  border-color: var(--accent);
 }
-
 .historySummary {
   list-style: none;
   cursor: pointer;
@@ -109,11 +96,9 @@
   align-items: center;
   gap: 10px;
 }
-
 .historySummary::-webkit-details-marker {
   display: none;
 }
-
 .historySummaryMain {
   display: flex;
   flex: 1;
@@ -121,7 +106,6 @@
   gap: 8px;
   min-width: 0;
 }
-
 .historyModeTag {
   font-size: 11px;
   font-weight: 700;
@@ -129,115 +113,82 @@
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
 }
-
-/* subtle color variations per mode */
-.mode-cs {
-  background: rgba(144, 97, 255, 0.18);
-  border-color: rgba(144, 97, 255, 0.6);
-}
-.mode-math {
-  background: rgba(30, 200, 180, 0.18);
-  border-color: rgba(30, 200, 180, 0.6);
-}
-.mode-science {
-  background: rgba(255, 180, 60, 0.18);
-  border-color: rgba(255, 180, 60, 0.6);
-}
-.mode-english {
-  background: rgba(255, 105, 180, 0.18);
-  border-color: rgba(255, 105, 180, 0.6);
-}
-.mode-other {
-  background: rgba(120, 130, 150, 0.2);
-  border-color: rgba(120, 130, 150, 0.7);
-}
-
 .historyAskText {
   font-size: 13px;
-  color: rgb(var(--fg));
+  color: var(--fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .historyTimestamp {
   font-size: 11px;
-  color: rgb(var(--muted));
+  color: var(--muted);
   white-space: nowrap;
 }
 
 .historyBody {
   padding: 10px 14px 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border);
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   gap: 12px;
 }
-
 @media (max-width: 800px) {
   .historyBody {
     grid-template-columns: 1fr;
   }
 }
-
 .historyMeta {
   font-size: 13px;
-  color: rgb(var(--muted));
+  color: var(--muted);
 }
-
 .historyMeta p {
   margin: 0 0 6px;
 }
-
 .historyCode {
   margin-top: 6px;
 }
-
 .historyCode pre {
   margin-top: 4px;
   padding: 8px 10px;
-  background: rgba(0, 0, 0, 0.24);
+  background: var(--surface-2);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   font-family: var(--font-mono);
   font-size: 12px;
   max-height: 180px;
   overflow: auto;
+  color: var(--fg);
 }
-
 .historyImages {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   align-items: flex-start;
 }
-
 .historyImages img {
   width: 110px;
   height: 90px;
   object-fit: cover;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
 }
-
 .historyResponse h3 {
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: rgb(var(--muted));
+  color: var(--muted);
   margin: 0 0 4px;
 }
-
 .historyResponseText {
   font-size: 13.5px;
   line-height: 1.6;
 }
-
-/* reuse markdown styling but tighten spacing */
 .historyResponseText p {
   margin: 0.4em 0;
 }
@@ -248,8 +199,8 @@
 .historyResponseText pre {
   margin: 0.5em 0;
   padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--surface-2);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--border);
   overflow: auto;
 }

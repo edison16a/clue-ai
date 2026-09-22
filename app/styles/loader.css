@@ -1,80 +1,51 @@
 /* Indeterminate loading bar */
-/* ===== premium seamless loader (background-position animation) ===== */
 
+/*
+ * A single solid block sliding along a track. Indeterminate because the
+ * model streams nothing back that could drive a percentage.
+ */
 .loaderWrap {
   display: grid;
   gap: 10px;
   place-items: center;
   padding: 12px 0;
 }
-
 .loaderTrack {
   position: relative;
   width: min(520px, 100%);
   height: 10px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
-  box-shadow: inset 0 1px 3px rgba(0,0,0,.30);
-  overflow: hidden;           /* hard clip */
+  background: var(--surface-3);
+  overflow: hidden;
   isolation: isolate;
 }
-
-/* We stop moving the element. The bar fills the track,
-   and we animate the background instead → no jumps, no cutoffs. */
 .loaderBar {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 35%;
   border-radius: inherit;
+  background: var(--accent);
   pointer-events: none;
-  /* colorful shimmer band that repeats across a much larger virtual area */
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(144,97,255,0) 0%,
-      rgba(144,97,255,.85) 25%,
-      rgba(30,200,180,.95) 50%,
-      rgba(144,97,255,.85) 75%,
-      rgba(30,200,180,0) 100%
-    );
-  background-size: 300% 100%;    /* big canvas to glide across */
-  background-position: 0% 0%;
-  filter: saturate(120%);
-  animation: loaderBgSlide 2.2s linear infinite;
+  animation: loaderSlide 1.4s ease-in-out infinite;
 }
-
-/* soft glossy echo on top, offset for parallax */
-.loaderBar::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background-image: linear-gradient(
-    90deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,.32) 45%,
-    rgba(255,255,255,0) 100%
-  );
-  background-size: 300% 100%;
-  background-position: 0% 0%;
-  animation: loaderBgSlide 2.2s linear infinite;
-  animation-delay: .18s;         /* slight lag */
-  pointer-events: none;
+@keyframes loaderSlide {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(300%); }
 }
-
-/* true continuous motion: we only change background-position */
-@keyframes loaderBgSlide {
-  from { background-position: -50% 0; }
-  to   { background-position: 150% 0; }
-}
-
 .loaderHint {
-  color: rgb(var(--muted));
+  color: var(--muted);
   font-size: 13px;
 }
 
-/* Respect reduced motion */
+/* The same bar inside the code overlay, with tighter spacing. */
+.overlayLoader {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .loaderBar, .loaderBar::after { animation-duration: 3.4s; }
+  .loaderBar { animation-duration: 2.6s; }
 }

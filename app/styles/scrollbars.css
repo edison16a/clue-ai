@@ -1,20 +1,18 @@
 /* Global scrollbars */
-/* === Global themed scrollbars (applies everywhere) === */
-
-/* Chrome / Edge / Safari */
 *::-webkit-scrollbar {
-  width: 10px;                  /* vertical scrollbar thickness */
-  height: 10px;                 /* horizontal scrollbar thickness */
+  width: 10px;
+  height: 10px;
 }
-
 *::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border-radius: 6px;
 }
-
-
-/* Firefox */
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 6px;
+  border: 2px solid var(--bg);
+}
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(185, 184, 189, 0.7) rgba(255,255,255,0.05);
+  scrollbar-color: var(--border-strong) transparent;
 }

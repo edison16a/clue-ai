@@ -1,5 +1,4 @@
 /* Container, hero, panel grid */
-/* ---------- Layout ---------- */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -17,16 +16,13 @@
   letter-spacing: -0.02em;
   line-height: 1.1;
   font-weight: 800;
-  background: linear-gradient(90deg, rgb(var(--fg)), rgb(144 97 255), rgb(30 200 180));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--fg);
 }
 
 .tagline {
   max-width: 740px;
   margin: 12px auto 20px;
-  color: rgb(var(--muted));
+  color: var(--muted);
   font-size: clamp(16px, 2.2vw, 18px);
 }
 .heroTop {
@@ -37,6 +33,7 @@
   margin-bottom: 8px;
 }
 
+/* The two preference pills in the top corners. */
 .saveToggleBtn,
 .themeToggleBtn {
   display: inline-flex;
@@ -44,13 +41,13 @@
   gap: 8px;
   padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(90deg, rgba(144,97,255,.16), rgba(30,200,180,.18));
-  color: rgb(var(--fg));
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
   cursor: pointer;
   font-weight: 700;
   letter-spacing: 0.16px;
-  box-shadow: 0 10px 22px rgba(0,0,0,.32);
+  box-shadow: var(--shadow-sm);
   transition:
     transform .08s ease,
     box-shadow .18s ease,
@@ -61,8 +58,8 @@
 .saveToggleBtn:hover,
 .themeToggleBtn:hover {
   transform: translateY(-1px);
-  border-color: rgba(144,97,255,.55);
-  box-shadow: 0 12px 24px rgba(144,97,255,.24);
+  border-color: var(--border-strong);
+  background: var(--surface-3);
 }
 .saveToggleBtn:active,
 .themeToggleBtn:active { transform: translateY(0); }
@@ -73,63 +70,28 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: rgba(0,0,0,.3);
-  box-shadow: 0 0 0 1px rgba(255,255,255,.12);
+  background: var(--surface-3);
+  color: var(--muted);
 }
 .saveToggleBtn.isOn {
-  background: linear-gradient(90deg, rgba(var(--accent),0.95), rgba(var(--accent-2),0.95));
-  border-color: rgba(var(--accent), 0.9);
-  box-shadow:
-    0 10px 22px rgba(var(--accent), .24),
-    0 0 0 2px rgba(var(--accent), 0.28);
-  color: rgb(var(--fg)); /* keep text bright on dark */
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--fg);
 }
 .saveToggleBtn.isOn .saveGlyph {
-  background: rgba(255,255,255,0.94);
-  color: #b45309;
-  box-shadow: 0 0 0 1px rgba(17,24,39,.08), 0 6px 14px rgba(0,0,0,0.25);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 .saveToggleBtn.isOff {
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.28));
-  border-color: rgba(255,255,255,0.25);
-  color: rgba(255,255,255,0.92);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+  color: var(--muted);
 }
-.saveToggleText,
 .saveToggleText,
 .themeToggleText { font-size: 13px; }
 
-/* Dark-mode specific polish to match theme toggle */
-:root.theme-dark .saveToggleBtn.isOn {
-  background: linear-gradient(135deg, rgba(58,46,102,0.95), rgba(120,94,210,0.9));
-  border-color: rgba(144,97,255,0.8);
-  color: #e8edf5;
-  box-shadow:
-    0 10px 24px rgba(0,0,0,0.5),
-    0 0 0 1px rgba(144,97,255,0.4);
-}
-:root.theme-dark .saveToggleBtn.isOn .saveGlyph {
-  background: rgba(255,255,255,0.12);
-  color: #f5d36b;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.16);
-}
-:root.theme-dark .saveToggleBtn.isOff {
-  background: linear-gradient(140deg, rgba(22,24,32,0.95), rgba(18,22,30,0.9));
-  border-color: rgba(255,255,255,0.18);
-  color: rgba(232,237,245,0.85);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.4);
-}
-
-.themeToggleBtn.isLight {
-  background: linear-gradient(90deg, rgba(var(--accent),0.9), rgba(var(--accent-2),0.95));
-  color: #0f172a;
-  border-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 10px 22px rgba(234,179,8,.25);
-}
-.themeToggleBtn.isLight .themeGlyph {
-  background: rgba(255,255,255,0.9);
-  color: #b45309;
-  box-shadow: 0 0 0 1px rgba(17,24,39,.08);
+.themeToggleBtn.isLight .themeGlyph,
+.themeToggleBtn.isDark .themeGlyph {
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .panel {

@@ -13,11 +13,10 @@
  *
  * Run with `npm run validate:data`. Exits non-zero on the first failure.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { extractSubjects } from "./extract-subjects.mjs";
 import { extractPrompts } from "./extract-prompts.mjs";
 import { extractUploads } from "./extract-uploads.mjs";
-import { extractTheme } from "./extract-theme.mjs";
 import { loadTheme, renderTokens } from "./generate-tokens.mjs";
 import { execFileSync } from "node:child_process";
 
@@ -362,14 +361,6 @@ check("the locate prompt still documents the format the parser expects", () => {
 console.log("\ndata/theme.json");
 const themeFile = readData("theme.json");
 
-check("round-trips against the pre-refactor stylesheet", () => {
-  assertDeepEqual(
-    themeFile.palettes,
-    extractTheme().palettes,
-    "data/theme.json has drifted from the baseline globals.css",
-  );
-});
-
 check("palette order is preserved", () => {
   // `base` must precede `systemLight`: they have identical specificity, so
   // swapping them would make the dark defaults win under a light OS theme.
@@ -379,6 +370,32 @@ check("palette order is preserved", () => {
     ["base", "systemLight", "dark", "light"],
     "palette order changed, which changes which block the cascade picks",
   );
+});
+
+check("every token the stylesheets use is defined in the base palette", () => {
+  // The feature stylesheets never name a colour, only `var(--token)`. A typo
+  // in a token name renders as the browser default with no error anywhere.
+  const stylesDir = new URL("../app/styles/", import.meta.url);
+  const defined = new Set(Object.keys(themeFile.palettes.base.tokens));
+  const used = new Set();
+  for (const file of readdirSync(stylesDir)) {
+    if (!file.endsWith(".css") || file.includes("generated")) continue;
+    const css = readFileSync(new URL(file, stylesDir), "utf8");
+    for (const [, name] of css.matchAll(/var\((--[a-z0-9-]+)\)/g)) used.add(name);
+  }
+  const unknown = [...used].filter((t) => !defined.has(t));
+  assert(unknown.length === 0, `stylesheets use undefined tokens: ${unknown.join(", ")}`);
+});
+
+check("feature stylesheets contain no hard-coded colours", () => {
+  const stylesDir = new URL("../app/styles/", import.meta.url);
+  const offenders = [];
+  for (const file of readdirSync(stylesDir)) {
+    if (!file.endsWith(".css") || file.includes("generated")) continue;
+    const css = readFileSync(new URL(file, stylesDir), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    if (/rgba?\(|#[0-9a-fA-F]{3,8}\b/.test(css)) offenders.push(file);
+  }
+  assert(offenders.length === 0, `hard-coded colours in: ${offenders.join(", ")}`);
 });
 
 check("every token value is non-empty and free of stray semicolons", () => {
@@ -397,8 +414,10 @@ check("the manual themes cover every colour the base palette defines", () => {
   // check exists to catch. Non-colour tokens (radii, fonts) are intentionally
   // defined once, so they are excluded.
   const nonColour = new Set(["--radius-lg", "--radius-md", "--radius-sm", "--font-system", "--font-mono"]);
+  // systemLight is the OS-preference fallback and must mirror `light` too:
+  // a token missing there would flash its dark value before hydration.
   const expected = Object.keys(themeFile.palettes.base.tokens).filter((t) => !nonColour.has(t));
-  for (const key of ["dark", "light"]) {
+  for (const key of ["dark", "light", "systemLight"]) {
     const missing = expected.filter((t) => !(t in themeFile.palettes[key].tokens));
     assert(missing.length === 0, `palette "${key}" is missing ${missing.join(", ")}`);
   }
@@ -417,15 +436,14 @@ check("is up to date with data/theme.json", () => {
   );
 });
 
-check("declares exactly the values the baseline stylesheet declared", () => {
+check("declares every token from data/theme.json", () => {
   // Re-parse the generated CSS independently of the generator, so a bug in
   // renderBlock() cannot make this check pass by agreeing with itself.
   const css = readFileSync(
     new URL("../app/styles/tokens.generated.css", import.meta.url),
     "utf8",
   );
-  const baseline = extractTheme().palettes;
-  for (const [key, block] of Object.entries(baseline)) {
+  for (const [key, block] of Object.entries(themeFile.palettes)) {
     for (const [name, value] of Object.entries(block.tokens)) {
       assert(
         css.includes(`${name}: ${value};`),

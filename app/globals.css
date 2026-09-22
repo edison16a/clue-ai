@@ -1,14 +1,11 @@
 /*
  * Stylesheet entry point.
  *
- * Import order is the cascade. These files were cut from one 1745-line
- * stylesheet at its own section boundaries, and several selectors are
- * declared in more than one of them — `.uploadRow` appears three times,
- * and only the last declaration's grid columns take effect. Reordering
- * these lines changes which rules win, so keep them in this sequence.
+ * Every colour comes from the tokens in tokens.generated.css, which is built
+ * from data/theme.json. The feature stylesheets never name a colour, so both
+ * themes come from the same rules and switching is only a token swap.
  *
- * tokens.generated.css comes first and is generated from data/theme.json;
- * run `npm run generate:tokens` after editing a colour.
+ * Run `npm run generate:tokens` after editing a colour.
  */
 
 @import "./styles/tokens.generated.css";
@@ -26,4 +23,3 @@
 @import "./styles/buttons.css";
 @import "./styles/line-hints.css";
 @import "./styles/scrollbars.css";
-@import "./styles/light-theme.css";

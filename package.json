@@ -12,7 +12,7 @@
     "validate:data": "node scripts/validate-data.mjs",
     "generate:tokens": "node scripts/generate-tokens.mjs",
     "test:coverage": "vitest run --coverage",
-    "verify": "npm run typecheck && npm run validate:data && node scripts/verify-stylesheet.mjs && npm run test"
+    "verify": "npm run typecheck && npm run validate:data && npm run test"
   },
   "dependencies": {
     "next": "^15.5.25",

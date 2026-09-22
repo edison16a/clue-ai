@@ -17,7 +17,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body className="root">
-        <div className="bg-gradient" aria-hidden="true" />
         {children}
       </body>
     </html>

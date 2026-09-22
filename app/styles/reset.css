@@ -1,7 +1,4 @@
 /* Reset and element defaults */
-/* app/globals.css */
-
-/* ---------- CSS Reset-ish ---------- */
 *,
 *::before,
 *::after { box-sizing: border-box; }

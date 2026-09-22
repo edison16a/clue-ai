@@ -1,26 +1,63 @@
 /* Upload row, thumbnails, ask input */
-/* --- Help button layout next to upload --- */
-/* --- Upload row now: [dropzone][thumb][help] --- */
+
+/*
+ * The row is a grid of [dropzone][thumbnails][help button], with the
+ * New Prompt button spanning the full width below. Visual order is set
+ * with `order` so the markup can stay in reading order.
+ */
 .uploadRow {
   display: grid;
-  grid-template-columns: 1fr 120px auto; /* Upload | Preview | Help */
+  grid-template-columns: 1fr auto auto;
   gap: 12px;
   align-items: stretch;
+  margin-top: 14px;
+}
+.dropzone  { order: 1; min-height: 90px; display: flex; align-items: center; }
+.thumbs    { order: 2; }
+.helpBtn   { order: 3; }
+.thumb     { order: 2; }
+
+.dzInner {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+.dropzone.hasFile .dzInner {
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.dropzone .dzText,
+.dropzone .dzTextUploaded {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.dropzone .fileNote {
+  font-size: 12px;
+  font-weight: 500;
 }
 
-/* Control order without changing JSX */
-.dropzone { order: 1; }
-.thumb    { order: 2; }
-.helpBtn  { order: 3; }
+/* Once a file is chosen, swap the prompt for "Upload More" and hide the name. */
+.dzTextUploaded { display: none; }
+.dropzone.hasFile .dzText { display: none; }
+.dropzone.hasFile .dzTextUploaded { display: inline; }
+.dropzone.hasFile .fileNote { display: none; }
 
-/* Preview box sizing next to button */
+/* Legacy single preview. Hidden whenever the gallery is showing. */
 .thumb {
   width: 120px;
   max-height: 110px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: rgba(0,0,0,.28);
-  border: 1px solid rgba(255,255,255,.08);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   display: grid;
   place-items: center;
 }
@@ -28,116 +65,10 @@
   object-fit: cover;
   width: 100%;
   height: 100%;
+  max-height: 110px;
 }
+.uploadRow.hasGallery .thumb { display: none; }
 
-/* Swap button text on upload */
-.dzTextUploaded { display: none; }
-.dropzone.hasFile .dzText { display: none; }            /* hide default */
-.dropzone.hasFile .dzTextUploaded { display: inline; }  /* show "File uploaded" */
-.dropzone.hasFile .fileNote { display: none; }          /* hide filename detail */
-
-/* Mobile: stack gracefully */
-@media (max-width: 640px) {
-  .uploadRow { grid-template-columns: 1fr; }
-  .thumb { width: 100%; max-height: 180px; }
-}
-
-
-/* Help button */
-.helpBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255,255,255,.12);
-  background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.28));
-  color: rgb(var(--fg));
-  font-weight: 700;
-  letter-spacing: .2px;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
-  white-space: nowrap;
-}
-.helpBtn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(144,97,255,.55);
-  background: linear-gradient(180deg, rgba(144,97,255,.14), rgba(144,97,255,.10));
-  box-shadow: 0 10px 22px rgba(144,97,255,.22);
-}
-.helpBtn:active { transform: translateY(0); }
-.helpBtn svg { opacity: .9; }
-
-/* Stack on small screens */
-@media (max-width: 640px) {
-  .uploadRow {
-    grid-template-columns: 1fr; /* drop to one column */
-  }
-  .helpBtn {
-    justify-content: center;
-    width: 100%;
-    margin-top: 10px;
-  }
-}
-
-/* === Optional help input styling === */
-.askInput {
-  width: 100%;
-  height: 44px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255,255,255,.08);
-  background: rgba(0,0,0,.22);
-  color: rgb(var(--fg));
-  padding: 10px 12px;
-  outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease, background .2s ease;
-}
-.askInput:focus {
-  border-color: color-mix(in oklab, rgb(var(--accent)) 55%, white);
-  box-shadow: 0 0 0 4px rgba(144,97,255,.18);
-  background: rgba(0,0,0,.28);
-}
-
-/* === Upload row tweaks: [dropzone][thumbs][help] === */
-.uploadRow {
-  display: grid;
-  grid-template-columns: 1fr auto auto; /* Upload | Previews | Help */
-  gap: 12px;
-  align-items: stretch;
-}
-
-/* order without changing JSX */
-.dropzone  { order: 1; min-height: 90px; display: flex; align-items: center; } /* ensure vertical baseline */
-.thumbs    { order: 2; }
-.helpBtn   { order: 3; }
-.thumb     { order: 2; } /* legacy single preview */
-
-/* center contents when file exists */
-.dzInner {
-  display: flex;
-  flex-direction: row;    /* icon above text */
-  gap: 8px;
-  align-items: center;       /* horizontal centering */
-  justify-content: center;   /* vertical centering */
-  text-align: center;        /* center text lines */
-  width: 100%;
-  height: 100%;
-}
-
-.dropzone.hasFile .dzInner {
-  justify-content: center;   /* horizontal centering (uploaded state) */
-  align-items: center;        /* vertical centering */
-  text-align: center;
-}
-
-/* hide filename & swap button text after upload */
-.dzTextUploaded { display: none; }
-.dropzone.hasFile .dzText { display: none; }
-.dropzone.hasFile .dzTextUploaded { display: inline; }
-.dropzone.hasFile .fileNote { display: none; }
-
-/* previews gallery */
 .thumbs {
   display: inline-flex;
   gap: 10px;
@@ -146,16 +77,14 @@
   overflow-x: auto;
   padding: 6px 2px;
 }
-
-/* each thumb with close button */
 .thumbItem {
   position: relative;
   width: 120px;
   height: 110px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: rgba(0,0,0,.28);
-  border: 1px solid rgba(255,255,255,.08);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   flex: 0 0 auto;
   display: grid;
   place-items: center;
@@ -173,9 +102,9 @@
   height: 22px;
   line-height: 20px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.28);
-  background: rgba(0,0,0,.55);
-  color: rgb(var(--fg));
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--fg);
   font-weight: 800;
   font-size: 14px;
   cursor: pointer;
@@ -183,16 +112,60 @@
   place-items: center;
 }
 .thumbClose:hover {
-  background: rgba(144,97,255,.55);
-  border-color: rgba(144,97,255,.75);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
 }
 
-/* when gallery is present, hide legacy single-thumb block (kept in JSX) */
-.uploadRow.hasGallery .thumb { display: none; }
+/* The primary action. The one solid accent fill on the page. */
+.helpBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  letter-spacing: .2px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  white-space: nowrap;
+}
+.helpBtn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.helpBtn:active { transform: translateY(0); }
+.helpBtn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  transform: none;
+}
 
-/* mobile */
+.askInput {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--fg);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .2s ease;
+}
+.askInput::placeholder { color: var(--muted); }
+.askInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
 @media (max-width: 640px) {
   .uploadRow { grid-template-columns: 1fr; }
+  .thumb { width: 100%; max-height: 180px; }
   .thumbs { max-width: 100%; }
-  .helpBtn { width: 100%; justify-content: center; }
+  .helpBtn { width: 100%; justify-content: center; margin-top: 10px; }
 }

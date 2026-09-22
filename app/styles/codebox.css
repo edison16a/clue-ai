@@ -1,27 +1,21 @@
 /* Code box scrollbar */
-/* === Custom scrollbar for the code input === */
 .codebox::-webkit-scrollbar {
-  width: 10px;                  /* thickness of vertical scrollbar */
-  height: 10px;                 /* thickness of horizontal scrollbar */
+  width: 10px;
+  height: 10px;
 }
-
 .codebox::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05); /* track color */
+  background: transparent;
   border-radius: 6px;
 }
-
 .codebox::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(144,97,255,.7), rgba(30,200,180,.7));
+  background: var(--border-strong);
   border-radius: 6px;
-  border: 2px solid rgba(0, 0, 0, 0.25); /* gives a gap effect */
+  border: 2px solid var(--surface-2);
 }
-
 .codebox::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(144,97,255,1), rgba(30,200,180,1));
+  background: var(--accent);
 }
-
-/* Firefox support */
 .codebox {
-  scrollbar-width: thin; /* auto | thin | none */
-  scrollbar-color: rgba(185, 184, 189, 0.7) rgba(255,255,255,0.05);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
 }
