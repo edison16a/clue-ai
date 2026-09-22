@@ -49,7 +49,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run validate:data` | Check every file in `data/` |
 | `npm run generate:tokens` | Rebuild the CSS colours from `data/theme.json` |
-| `npm run verify` | Typecheck, data checks, stylesheet check and tests |
+| `npm run verify` | Typecheck, data checks and tests |
 
 ---
 
@@ -81,8 +81,8 @@ lib/                       Logic. No JSX, no fetch.
 
 app/
   page.tsx, layout.tsx       Route entry and document shell
-  globals.css                Stylesheet entry. Import order is the cascade.
-  styles/                    Per-feature stylesheets
+  globals.css                Stylesheet entry
+  styles/                    Per-feature stylesheets, colours from tokens only
   components/                UI, one file per piece of the screen
   api/help, api/locate, api/extract    Thin HTTP adapters
 
@@ -158,6 +158,8 @@ Add the extension without a leading dot to `textExtensions` in `data/uploads.jso
 
 Edit `data/theme.json`, then run `npm run generate:tokens`. Don't edit `app/styles/tokens.generated.css` directly, `npm run validate:data` fails if it is stale.
 
+Dark mode is black with purple and light mode is white with orange. The stylesheets only ever use `var(--token)`, never a literal colour, so a theme is nothing more than a set of token values and the validator fails if a literal sneaks in. Each token is described at the top of `theme.json`.
+
 The four palettes are in a deliberate order. `base` and `systemLight` have equal CSS specificity, so only source order separates them. The `theme-dark` and `theme-light` blocks carry an extra class and win from anywhere, which is how the manual toggle beats the OS setting.
 
 ### Change a model or a limit
@@ -168,7 +170,7 @@ Edit `data/config.json`. It holds the model and retention flag per endpoint, the
 
 ## 🧰 Scripts
 
-`validate-data.mjs` runs 26 checks over `data/`, including round-trips against the original source. `verify-stylesheet.mjs` diffs the split stylesheets against the original single file. `generate-tokens.mjs` turns `data/theme.json` into CSS. The `extract-*.mjs` scripts are the one-shot tools that pulled the data out of the source in the first place, kept because the validator re-runs them.
+`validate-data.mjs` runs 27 checks over `data/`, including round-trips against the original source and a check that no stylesheet names a colour directly. `generate-tokens.mjs` turns `data/theme.json` into CSS. The `extract-*.mjs` scripts are the one-shot tools that pulled the data out of the source in the first place, kept because the validator re-runs them.
 
 ---
 
