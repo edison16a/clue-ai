@@ -54,7 +54,12 @@ export function UploadRow({
         // without a mouse.
         tabIndex={0}
         onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") fileInputRef.current?.click();
+          if (event.key !== "Enter" && event.key !== " ") return;
+          // Without preventDefault, Space also did its default job of
+          // scrolling the page, so the picker opened while the page jumped
+          // down behind it.
+          event.preventDefault();
+          fileInputRef.current?.click();
         }}
       >
         <input
