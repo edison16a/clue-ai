@@ -15,7 +15,7 @@ import subjectsData from "@/data/subjects.json";
  * A subject id, derived from data/subjects.json rather than hand-written.
  *
  * Deriving it means adding a subject to the JSON widens the type
- * automatically — the point of the data extraction. It also means a typo in
+ * automatically, which is the point of the data extraction. It also means a typo in
  * the JSON surfaces as a type error at every use site.
  */
 export type SubjectId = (typeof subjectsData.subjects)[number]["id"];
@@ -23,7 +23,7 @@ export type SubjectId = (typeof subjectsData.subjects)[number]["id"];
 /**
  * How a subject chip's icon is drawn.
  *
- * "glyph" is a character rendered as text and is pure content — swap it by
+ * "glyph" is a character rendered as text and is pure content: swap it by
  * editing the JSON. "component" names an entry in the icon registry, used
  * where the icon must be an SVG that inherits `currentColor` so it recolours
  * with the theme and with button states.
@@ -70,7 +70,7 @@ export interface ImageAttachment {
  *
  * `start` and `end` are 1-based and inclusive, matching how the prompt asks
  * the model to count and how the overlay numbers its rows. They have already
- * been widened by one line either side and clamped to the document — see
+ * been widened by one line either side and clamped to the document. See
  * `parseLocatorText`.
  */
 export interface LineHint {
@@ -83,7 +83,7 @@ export interface LineHint {
 /**
  * One saved interaction, as persisted to localStorage.
  *
- * Images are stored inline as data URLs, which is why the list is capped —
+ * Images are stored inline as data URLs, which is why the list is capped:
  * a handful of screenshots is enough to approach the ~5MB origin quota.
  */
 export interface HistoryItem {

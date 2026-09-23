@@ -18,7 +18,7 @@ interface LineHintOverlayProps {
  * The panel that covers the textarea and shades the lines worth inspecting.
  *
  * It is an overlay rather than decoration inside the textarea because a
- * `<textarea>` cannot carry per-line styling at all — its content is a single
+ * `<textarea>` cannot carry per-line styling at all; its content is a single
  * text node. Rendering a parallel, read-only copy of the lines is the standard
  * way around that, at the cost of the two having to number identically.
  */

@@ -2,7 +2,7 @@
  * Building and validating saved-history records.
  *
  * Split out from the component because the cap and the record shape are rules
- * about data, not about rendering — and because the original applied the cap
+ * about data, not about rendering, and because the original applied the cap
  * in two places (the success path and the error path) with the magic number
  * written out both times.
  */
@@ -26,7 +26,7 @@ export interface HistoryDraft {
  * Creates a record for one interaction.
  *
  * Images are copied rather than referenced so that later edits to the
- * live attachment list — removing a thumbnail, starting a new prompt — cannot
+ * live attachment list (removing a thumbnail, starting a new prompt) cannot
  * reach backwards and mutate an entry the student already saved.
  *
  * `now` is injectable so tests can assert on ids and timestamps instead of
@@ -48,7 +48,7 @@ export function createHistoryItem(draft: HistoryDraft, now: Date = new Date()): 
  * Prepends an entry and enforces the cap.
  *
  * Newest-first ordering is what the UI renders directly, so the cap drops the
- * oldest entries — trimming from the end rather than refusing to add.
+ * oldest entries, trimming from the end rather than refusing to add.
  */
 export function withNewEntry(
   history: readonly HistoryItem[],
@@ -62,7 +62,7 @@ export function withNewEntry(
  *
  * Checks each record's fields rather than trusting the array, because a
  * half-written or older-schema entry renders as a blank card or throws inside
- * `item.images.map` — both worse than dropping the stored history.
+ * `item.images.map`. Both are worse than dropping the stored history.
  */
 export function isHistoryArray(value: unknown): value is HistoryItem[] {
   return (

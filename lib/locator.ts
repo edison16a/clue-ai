@@ -3,7 +3,7 @@
  *
  * `/api/locate` asks the model for plain text in a fixed shape rather than
  * JSON, and this module turns that text back into structured ranges. Keeping
- * it here — pure, with no React and no fetch — is what makes it testable; it
+ * it here (pure, with no React and no fetch) is what makes it testable; it
  * previously sat at the top of a 970-line client component where the only way
  * to exercise it was to run the app against a live model.
  */
@@ -35,7 +35,7 @@ export interface LocatorResult {
  * Widens a range by one line either side, clamped to the document.
  *
  * WHY widen: the model names the line it believes is wrong, but the cause is
- * usually the statement around it — a loop header's bound, the declaration
+ * usually the statement around it: a loop header's bound, the declaration
  * above the use. Showing one extra line either way is what makes the highlight
  * land on something a student can read as a unit rather than a lone token.
  */
@@ -51,8 +51,8 @@ function widenToContext(range: LineHint, totalLines: number): LineHint {
 /**
  * Parses the locator's plain-text reply.
  *
- * Unrecognised lines — the `LINES:` header, blank lines, any preamble the
- * model adds — are ignored rather than treated as errors, because a strict
+ * Unrecognised lines (the `LINES:` header, blank lines, any preamble the
+ * model adds) are ignored rather than treated as errors, because a strict
  * parser would discard a perfectly good set of bullets over a stray sentence.
  *
  * @param text       Raw `aiText` from /api/locate.
@@ -68,7 +68,7 @@ export function parseLocatorText(text: string, totalLines: number): LocatorResul
       const start = Number(bullet[1]);
       const parsedEnd = bullet[2] ? Number(bullet[2]) : start;
       // A line number of 0 or below cannot be pointed at, and a reversed range
-      // (end < start) is taken as a single-line hit rather than dropped — the
+      // (end < start) is taken as a single-line hit rather than dropped. The
       // model clearly meant *somewhere*, and losing the hint helps nobody.
       if (Number.isFinite(start) && start > 0) {
         const end = Number.isFinite(parsedEnd) && parsedEnd >= start ? parsedEnd : start;
@@ -78,7 +78,7 @@ export function parseLocatorText(text: string, totalLines: number): LocatorResul
     }
 
     // Trimmed before matching. This previously tested the raw line, so a
-    // NOTE: with any leading whitespace was skipped — and the prompt's own
+    // NOTE: with any leading whitespace was skipped, and the prompt's own
     // "if unsure" example indents it by two spaces, which means the note was
     // most likely to be dropped in exactly the case it exists to convey: the
     // model having nothing confident to point at. The student then saw
@@ -114,7 +114,7 @@ export type LineEmphasis = "hit" | "context" | "none";
  *
  * "context" is the line immediately outside a range. Because ranges have
  * already been widened by `widenToContext`, this shades a *second* line either
- * side — the effect is a bright core with a softer halo, which is why the two
+ * side. The effect is a bright core with a softer halo, which is why the two
  * widenings are not redundant.
  */
 export function emphasisForLine(

@@ -6,10 +6,10 @@ import { STORAGE_KEYS } from "@/lib/storage";
 
 /**
  * Stored records outlive the code that wrote them. These cover the values a
- * real origin can end up holding — a truncated write, an older schema, another
- * script on the same origin — each of which used to reach React unchecked.
+ * real origin can end up holding (a truncated write, an older schema, another
+ * script on the same origin), each of which used to reach React unchecked.
  */
-describe("useHistory — malformed stored data", () => {
+describe("useHistory: malformed stored data", () => {
   beforeEach(() => {
     window.localStorage.clear();
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -31,7 +31,7 @@ describe("useHistory — malformed stored data", () => {
     const { result } = renderHook(() => useHistory());
     await waitFor(() => expect(result.current.saveHistory).toBe(true));
 
-    // The value React receives must always be a real array — a string's
+    // The value React receives must always be a real array. A string's
     // truthy `.length` was what previously got it as far as `images.map`.
     expect(Array.isArray(result.current.history)).toBe(true);
     expect(result.current.history).toEqual([]);

@@ -1,8 +1,8 @@
 /**
  * File-upload rules, derived from data/uploads.json.
  *
- * The accepted-type list used to exist twice in incompatible notations — the
- * `accept` attribute and a regex in `isTextLikeFile` — which meant the picker
+ * The accepted-type list used to exist twice in incompatible notations (the
+ * `accept` attribute and a regex in `isTextLikeFile`), which meant the picker
  * and the drop handler could disagree without anything noticing. Both are now
  * computed from the same array, so they cannot drift.
  */
@@ -30,7 +30,7 @@ const TEXT_EXTENSION_PATTERN = new RegExp(`\\.(${TEXT_EXTENSIONS.join("|")})$`, 
  * Whether a file should be read as text into the code box.
  *
  * Checks the MIME type first because it is authoritative when the browser
- * supplies one, then falls back to the extension — browsers report an empty
+ * supplies one, then falls back to the extension. Browsers report an empty
  * type for many source files (.java, .kt, .scala have no registered MIME
  * type), so extension matching is the only thing that catches them.
  */

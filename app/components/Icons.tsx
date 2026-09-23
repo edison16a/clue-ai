@@ -22,7 +22,7 @@ interface IconProps {
  * carried `role="presentation"`, some `aria-hidden="true"`, and some nothing
  * at all. All three hide a decorative graphic in practice, and every icon here
  * sits inside a control that already has an accessible name, so the choice has
- * no user-visible effect — but it is reproduced per icon so the rendered
+ * no user-visible effect, but it is reproduced per icon so the rendered
  * markup is unchanged. Worth unifying on `aria-hidden` separately.
  */
 type Presentation = "presentation" | "hidden" | "none";

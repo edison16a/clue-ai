@@ -36,7 +36,7 @@ function readBaseline(path) {
  * Pulls `const NAME = \`...\`.trim();` apart.
  *
  * The original applied `.trim()` to each literal, so the stored file must be
- * the trimmed value — otherwise the leading newline every one of them starts
+ * the trimmed value, otherwise the leading newline every one of them starts
  * with would be sent to the model and the prompt would no longer be identical.
  */
 function extractPrompt({ path, constant }) {

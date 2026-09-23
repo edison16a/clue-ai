@@ -34,7 +34,7 @@ export function useHistory() {
    * This must be state rather than a ref. Effects in one commit run in
    * declaration order and share that render's values, so a ref set by the
    * restore effect is already true when the persist effects run immediately
-   * after — the guard would do nothing. State is read from the render
+   * after, so the guard would do nothing. State is read from the render
    * snapshot, so the persist effects see `false` on mount and only run on the
    * subsequent render, by which point the restored values have been applied.
    */
@@ -50,7 +50,7 @@ export function useHistory() {
 
     if (allowed) {
       // Validated, not just parsed. This used to be `JSON.parse(raw) as
-      // HistoryItem[]` — a cast, which checks nothing at runtime. A stored
+      // HistoryItem[]`, a cast, which checks nothing at runtime. A stored
       // value that is valid JSON of the wrong shape therefore reached React
       // intact: a string has a truthy `.length`, so the history section
       // rendered and `item.images.map` threw, taking the whole page down with
@@ -69,8 +69,8 @@ export function useHistory() {
    * Mirrors entries into storage as they change.
    *
    * Gated on `hasRestored` to fix a real data-loss window. The effect used to
-   * run on mount against the initial empty array — the restore effect's
-   * setHistory having been queued but not applied — and wrote `[]` straight
+   * run on mount against the initial empty array (the restore effect's
+   * setHistory had been queued but not applied) and wrote `[]` straight
    * over the stored entries before rewriting the real ones a render later.
    * Self-healing in the normal case, but the entries were genuinely gone for
    * that interval, on every page load, and permanently if the tab closed

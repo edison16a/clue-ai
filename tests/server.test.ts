@@ -9,7 +9,7 @@ describe("loadPrompt", () => {
    * Prompts are read from disk at runtime rather than imported, which is what
    * makes them editable as content. That also means nothing in the module
    * graph references them, so a missing or unshipped file fails at request
-   * time — these tests are the compile-time check that no longer exists.
+   * time. These tests are the compile-time check that no longer exists.
    */
   it("loads each prompt with content", () => {
     for (const name of ["help", "locate", "extract"] as const) {

@@ -10,7 +10,7 @@ export const runtime = "nodejs";
  * Returns the line ranges worth inspecting, as plain text.
  *
  * The reply is deliberately not JSON. It is parsed client-side by
- * lib/locator.ts, which tolerates a stray sentence or a missing header — a
+ * lib/locator.ts, which tolerates a stray sentence or a missing header. A
  * strict JSON contract would turn any formatting slip into a total failure,
  * and this feature degrades better than it fails.
  */

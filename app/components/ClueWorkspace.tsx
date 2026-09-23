@@ -21,7 +21,7 @@ import { UploadRow } from "@/app/components/UploadRow";
  * flows that read it.
  *
  * State lives here rather than in the individual panels because almost all of
- * it is shared — the subject chooses the textarea's label, the textarea's
+ * it is shared: the subject chooses the textarea's label, the textarea's
  * content drives both requests, and a request's result populates the response
  * panel and the overlay at once. The presentational components below take
  * props and own nothing.
@@ -100,8 +100,8 @@ export function ClueWorkspace() {
    * The next array is computed before any state is set. Previously the two
    * dependent updates were issued from *inside* the `setImages` updater,
    * which React requires to be a pure function of its argument: it is free to
-   * call an updater more than once — it does exactly that under StrictMode in
-   * development — and to discard the result, so those nested updates could run
+   * call an updater more than once (it does exactly that under StrictMode in
+   * development) and to discard the result, so those nested updates could run
    * twice or against a state React then threw away.
    */
   const removeImage = (index: number) => {
@@ -182,7 +182,7 @@ export function ClueWorkspace() {
    * The primary action: transcribe images if needed, fetch guidance, save the
    * interaction, then locate lines.
    *
-   * Extraction runs only when there are images and the code box is empty — a
+   * Extraction runs only when there are images and the code box is empty. A
    * student who pasted code and also attached a screenshot meant the paste to
    * be the submission, and overwriting it would discard their work.
    */

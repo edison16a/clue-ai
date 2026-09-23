@@ -22,7 +22,7 @@ interface HeroHeaderProps {
  * chips.
  *
  * Both toggles are `aria-pressed` buttons rather than checkboxes because they
- * take effect immediately and belong to no form — that is the role a screen
+ * take effect immediately and belong to no form, and that is the role a screen
  * reader should announce for a control that switches something on.
  */
 export function HeroHeader({

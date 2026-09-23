@@ -3,7 +3,7 @@
  *
  * The locator is asked to reply with line numbers, so the model has to see the
  * same numbering the browser will apply to the highlight overlay. Any
- * disagreement between the two shifts every highlight — which is why this is a
+ * disagreement between the two shifts every highlight, which is why this is a
  * shared, tested function rather than an inline `map` in the route.
  */
 

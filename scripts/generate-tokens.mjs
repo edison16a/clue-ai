@@ -4,7 +4,7 @@
  *
  * WHY generate rather than hand-write: CSS has no way to import values from
  * JSON, so the palette has to exist as CSS somewhere. Generating it keeps
- * data/theme.json the single source of truth — a designer edits one file and
+ * data/theme.json the single source of truth. A designer edits one file and
  * reruns `npm run generate:tokens` instead of hunting four blocks spread over
  * 1200 lines of stylesheet and working out which one the cascade picks.
  *
@@ -33,12 +33,12 @@ function renderBlock({ selector, media, tokens }) {
 export function renderTokens(theme) {
   const blocks = Object.entries(theme.palettes).map(([key, block]) => {
     const scope = block.media ? `${block.selector} under @media ${block.media}` : block.selector;
-    return `/* ${key} — ${scope} */\n${renderBlock(block)}`;
+    return `/* ${key}: ${scope} */\n${renderBlock(block)}`;
   });
 
   return [
     "/*",
-    " * GENERATED FILE — DO NOT EDIT.",
+    " * GENERATED FILE. DO NOT EDIT.",
     " *",
     " * Produced from data/theme.json by scripts/generate-tokens.mjs.",
     " * Run `npm run generate:tokens` after changing a colour.",

@@ -2,7 +2,7 @@
  * Guarded localStorage access.
  *
  * Every call is wrapped because `localStorage` is not merely absent during
- * server rendering — it also *throws* on access in a Safari private window and
+ * server rendering. It also *throws* on access in a Safari private window and
  * whenever a user has blocked site data. The original code hand-wrote a
  * `typeof window === "undefined"` guard plus a try/catch at each of the seven
  * call sites, and two of them swallowed the error with a bare `{}` while the
@@ -60,7 +60,7 @@ export function removeRaw(key: string): void {
  *
  * The `isValid` predicate is not optional decoration. Stored records outlive
  * the code that wrote them, so a value can be syntactically valid JSON and
- * still be the wrong shape — an older schema, or something another script on
+ * still be the wrong shape: an older schema, or something another script on
  * the origin wrote. Without the check that value reaches React and renders as
  * a crash rather than a fallback.
  */

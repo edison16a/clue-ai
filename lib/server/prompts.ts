@@ -11,7 +11,7 @@ export type PromptName = "help" | "locate" | "extract";
  * Reading at runtime rather than importing a string constant is what makes the
  * prompts editable as content: a `.md` file can be reviewed as prose and
  * changed by someone who does not write TypeScript. Caching keeps that from
- * costing a synchronous read per request — on a warm serverless instance the
+ * costing a synchronous read per request. On a warm serverless instance the
  * file is read once.
  *
  * `process.cwd()` is the project root in both `next dev` and the serverless

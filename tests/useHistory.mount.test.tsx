@@ -17,7 +17,7 @@ function entry(id: number): HistoryItem {
   };
 }
 
-describe("useHistory — mount ordering", () => {
+describe("useHistory: mount ordering", () => {
   beforeEach(() => {
     window.localStorage.clear();
     vi.restoreAllMocks();
@@ -28,7 +28,7 @@ describe("useHistory — mount ordering", () => {
    * on mount against the initial empty array and overwriting the stored
    * entries before the restore effect's state had been applied.
    *
-   * Asserted by watching every write, not just the final value — the old
+   * Asserted by watching every write, not just the final value. The old
    * behaviour converged to the right answer a render later, so only the
    * sequence of writes distinguishes it.
    */

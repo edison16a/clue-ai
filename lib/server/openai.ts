@@ -32,7 +32,7 @@ export function modelFor(endpoint: Endpoint): string {
 /**
  * Whether OpenAI should retain the response for an endpoint.
  *
- * All three are currently true, which is what the pre-refactor code did —
+ * All three are currently true, which is what the pre-refactor code did,
  * though only one of them said so. `help` passed `store: true` explicitly;
  * locate and extract omitted the field, and the Responses API defaults it to
  * true. Reading the old code, it looked as though two of the three calls did

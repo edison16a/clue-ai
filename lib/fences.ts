@@ -17,7 +17,7 @@ const BARE_FENCE = /^```\s*([\s\S]*?)\s*```$/;
 /**
  * Removes one pair of surrounding fences, preserving the text between them.
  *
- * Only strips a fence that wraps the *entire* string — both patterns are
+ * Only strips a fence that wraps the *entire* string; both patterns are
  * anchored. Code containing a fenced block in the middle (a Markdown file a
  * student is working on, say) is returned untouched, because removing an
  * interior fence would corrupt their content.

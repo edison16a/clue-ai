@@ -7,7 +7,7 @@ const isStringArray = (value: unknown): value is string[] =>
 
 /**
  * Every call is guarded because localStorage does not merely go missing when
- * site data is blocked — it throws on access, in Safari private windows and
+ * site data is blocked. It throws on access, in Safari private windows and
  * under some enterprise policies. These tests cover that, since it is the case
  * nobody reproduces by hand.
  */

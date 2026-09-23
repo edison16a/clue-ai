@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 /**
  * Returns coaching hints for a submission.
  *
- * A thin adapter by design — parse, delegate, serialise. The prompt and the
+ * A thin adapter by design: parse, delegate, serialise. The prompt and the
  * model call live in lib/server/services.ts so they can be read and tested
  * without a request.
  */

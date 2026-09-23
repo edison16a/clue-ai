@@ -7,7 +7,7 @@ import type { AiTextResponse, ApiErrorResponse } from "@/lib/types";
  * Each route hand-built `new Response(JSON.stringify(...), { status, headers })`
  * and two of the five error paths omitted the Content-Type header, so those
  * replies went out as `text/plain` even though the client called `.json()` on
- * them. It happened to work — fetch parses regardless — but it is the kind of
+ * them. It happened to work (fetch parses regardless), but it is the kind of
  * inconsistency that breaks the moment anything else consumes the endpoint.
  */
 
@@ -16,7 +16,7 @@ export function aiTextResponse(aiText: string): Response {
   return jsonResponse<AiTextResponse>({ aiText }, 200);
 }
 
-/** A failure reply. The message is surfaced to the student, prefixed "Oops —". */
+/** A failure reply. The message is surfaced to the student, prefixed with strings.response.errorPrefix. */
 export function errorResponse(message: string, status: number): Response {
   return jsonResponse<ApiErrorResponse>({ error: message }, status);
 }

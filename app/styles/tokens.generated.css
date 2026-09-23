@@ -1,5 +1,5 @@
 /*
- * GENERATED FILE — DO NOT EDIT.
+ * GENERATED FILE. DO NOT EDIT.
  *
  * Produced from data/theme.json by scripts/generate-tokens.mjs.
  * Run `npm run generate:tokens` after changing a colour.
@@ -11,7 +11,7 @@
  * operating system's preference.
  */
 
-/* base — :root */
+/* base: :root */
 :root {
   --bg: #000000;
   --surface: #101012;
@@ -36,7 +36,7 @@
   --font-system: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
-/* systemLight — :root under @media (prefers-color-scheme: light) */
+/* systemLight: :root under @media (prefers-color-scheme: light) */
 @media (prefers-color-scheme: light) {
   :root {
     --bg: #ffffff;
@@ -58,7 +58,7 @@
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 }
-/* dark — :root.theme-dark */
+/* dark: :root.theme-dark */
 :root.theme-dark {
   --bg: #000000;
   --surface: #101012;
@@ -78,7 +78,7 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
-/* light — :root.theme-light */
+/* light: :root.theme-light */
 :root.theme-light {
   --bg: #ffffff;
   --surface: #ffffff;

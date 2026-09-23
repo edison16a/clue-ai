@@ -8,7 +8,7 @@
  *
  * Vitest does not run under that condition, so importing a server module in a
  * test hits the throwing build. Stubbing it keeps the guard active in the real
- * build — where it matters — while letting the tests exercise the same
+ * build (where it matters) while letting the tests exercise the same
  * modules Next ships.
  */
 export {};

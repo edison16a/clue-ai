@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validates every file under `data/` — structurally, and where the data was
+ * Validates every file under `data/`: structurally, and where the data was
  * machine-extracted, against a fresh re-extraction from the pre-refactor
  * source.
  *
@@ -410,7 +410,7 @@ check("every token value is non-empty and free of stray semicolons", () => {
 
 check("the manual themes cover every colour the base palette defines", () => {
   // A colour present in `base` but absent from `:root.theme-light` keeps its
-  // dark value when the user picks light mode — that is the class of bug this
+  // dark value when the user picks light mode. That is the class of bug this
   // check exists to catch. Non-colour tokens (radii, fonts) are intentionally
   // defined once, so they are excluded.
   const nonColour = new Set(["--radius-lg", "--radius-md", "--radius-sm", "--font-system", "--font-mono"]);

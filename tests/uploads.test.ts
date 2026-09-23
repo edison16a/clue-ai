@@ -8,8 +8,8 @@ function file(name: string, type = ""): File {
 }
 
 /**
- * The accepted-type list used to exist twice in incompatible notations — the
- * `accept` attribute and a regex — which let the file picker and the drop
+ * The accepted-type list used to exist twice in incompatible notations (the
+ * `accept` attribute and a regex), which let the file picker and the drop
  * handler disagree silently. These tests pin them to one list.
  */
 describe("upload rules", () => {
@@ -39,8 +39,8 @@ describe("isTextLikeFile", () => {
   });
 
   it("falls back to the extension when the browser reports no type", () => {
-    // Browsers report an empty type for most source files — .java, .kt and
-    // .scala have no registered MIME type — so this is the common path, not
+    // Browsers report an empty type for most source files (.java, .kt and
+    // .scala have no registered MIME type), so this is the common path, not
     // the fallback.
     expect(isTextLikeFile(file("Main.java", ""))).toBe(true);
     expect(isTextLikeFile(file("app.kt", ""))).toBe(true);

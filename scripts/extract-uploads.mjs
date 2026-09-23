@@ -4,13 +4,13 @@
  * pre-refactor code listed accepted file types.
  *
  * WHY this matters more than it looks: the list appeared twice, in different
- * notations — once as the `accept` attribute on the file input
+ * notations: once as the `accept` attribute on the file input
  * (`image/*,.txt,.java,...`) and once as a regex inside `isTextLikeFile`
  * (`/\.(txt|java|...)$/i`). The attribute decides what the OS file picker
  * shows; the regex decides what actually gets read into the code box. They
  * happened to agree, but nothing enforced that, so adding `.rs` to one and
  * forgetting the other would produce a file the picker offers and the app then
- * silently ignores — a bug with no error message anywhere.
+ * silently ignores, a bug with no error message anywhere.
  *
  * The script extracts both, asserts they are the same set, and emits one list.
  *

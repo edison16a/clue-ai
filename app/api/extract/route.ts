@@ -11,7 +11,7 @@ export const runtime = "nodejs";
  *
  * Two distinct failures are reported separately because they mean different
  * things to a student: 400 means nothing was submitted, 422 means the images
- * arrived but nothing legible came back — retry with a clearer photo.
+ * arrived but nothing legible came back, so retry with a clearer photo.
  */
 export async function POST(req: Request) {
   try {

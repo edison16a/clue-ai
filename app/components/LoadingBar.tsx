@@ -9,7 +9,7 @@ interface LoadingBarProps {
  * Indeterminate progress bar.
  *
  * Indeterminate rather than a percentage because the model streams nothing
- * back that could drive one — the request either has not returned or has.
+ * back that could drive one. The request either has not returned or has.
  * Rendered in two places (the response panel and the code overlay) which
  * previously had two copies of this markup.
  */

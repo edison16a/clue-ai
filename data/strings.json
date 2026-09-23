@@ -1,5 +1,5 @@
 {
-  "$comment": "Every user-visible string in the interface, verbatim from the pre-refactor JSX. Copy edits — including the typos noted below — are made here, not in components. Curly apostrophes and the ellipsis character are intentional and reproduce the original rendering exactly.",
+  "$comment": "Every user-visible string in the interface, verbatim from the pre-refactor JSX. Copy edits, including the typos noted below, are made here, not in components. Curly apostrophes and the ellipsis character are intentional and reproduce the original rendering exactly.",
 
   "brand": {
     "name": "Clue-ai",
@@ -51,7 +51,7 @@
 
   "response": {
     "heading": "AI Response",
-    "$placeholderComment": "Rendered before the first request. `{subject}` is replaced with the active subject's shortLabel, lowercased — the original inlined `modeReadable(subjectMode).toLowerCase()` here.",
+    "$placeholderComment": "Rendered before the first request. `{subject}` is replaced with the active subject's shortLabel, lowercased. The original inlined `modeReadable(subjectMode).toLowerCase()` here.",
     "placeholderLead": "Press {action} to start. I’ll analyze your {subject} work, images, and context and return coaching-only steps (no spoilers).",
     "$placeholderBulletsComment": "\"a screenshots\" is a typo present in the shipped copy. It is reproduced verbatim so this extraction is a pure move; fix it here when you want the wording changed.",
     "placeholderBullets": [

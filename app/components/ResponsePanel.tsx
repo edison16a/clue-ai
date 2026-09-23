@@ -15,7 +15,7 @@ interface ResponsePanelProps {
  * The right-hand column: guidance, the loading bar, or the empty-state hint.
  *
  * `aria-live="polite"` announces the guidance when it lands without
- * interrupting whatever a screen reader is currently reading — the student may
+ * interrupting whatever a screen reader is currently reading. The student may
  * still be navigating their own code when the reply arrives.
  */
 export function ResponsePanel({ subject, aiText, isLoading }: ResponsePanelProps) {

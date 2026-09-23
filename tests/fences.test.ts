@@ -4,7 +4,7 @@ import { stripCodeFences } from "@/lib/fences";
 
 /**
  * Transcribed code goes straight into the student's textarea and then to the
- * locator, which numbers whatever it is given — so a stray fence does not just
+ * locator, which numbers whatever it is given, so a stray fence does not just
  * look wrong, it shifts every line number by one.
  */
 describe("stripCodeFences", () => {

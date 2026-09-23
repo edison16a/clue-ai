@@ -16,7 +16,7 @@ interface HistorySectionProps {
  * Past questions and their guidance, newest first.
  *
  * Renders nothing when empty rather than showing a placeholder, matching the
- * original — the section simply does not exist until there is something in it.
+ * original. The section simply does not exist until there is something in it.
  */
 export function HistorySection({ history, onClear }: HistorySectionProps) {
   if (history.length === 0) return null;
@@ -60,7 +60,7 @@ export function HistorySection({ history, onClear }: HistorySectionProps) {
  * One collapsed interaction.
  *
  * `<details>` gives the expand/collapse for free, including keyboard operation
- * and the open state being exposed to assistive technology — none of which a
+ * and the open state being exposed to assistive technology, none of which a
  * div plus an onClick would provide without extra work.
  */
 function HistoryEntry({ item }: { item: HistoryItem }) {

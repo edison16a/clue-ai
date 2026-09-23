@@ -54,7 +54,7 @@ describe("numbering and locating agree", () => {
   /**
    * The contract that matters: the route numbers the lines the model sees and
    * the client numbers the lines it highlights. If those ever disagree, every
-   * highlight lands on the wrong row and nothing errors — so pin them
+   * highlight lands on the wrong row and nothing errors, so pin them
    * together rather than testing each in isolation.
    */
   it("a line number in the listing selects that same line in the overlay", () => {

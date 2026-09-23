@@ -8,8 +8,8 @@
  * array, three parallel ternary chains for labels/placeholders/aria-labels, a
  * `modeReadable` switch, a per-mode block of inline icon JSX, and a
  * SUBJECT_LABELS map duplicated across two API routes). Retyping ~35 strings
- * by hand — several of which contain escapes, smart quotes and embedded
- * newlines — is exactly the kind of work that produces silent one-character
+ * by hand (several of which contain escapes, smart quotes and embedded
+ * newlines) is exactly the kind of work that produces silent one-character
  * drift. Parsing them out guarantees the JSON is byte-identical to what the
  * app used to render.
  *
@@ -141,7 +141,7 @@ function parseApiLabels(source) {
  * Extracts each subject chip's icon from the per-mode JSX blocks.
  *
  * The original rendered these as five sibling `{mode.id === "x" && (...)}`
- * expressions. Four contained a single character — "∆", an emoji — and one
+ * expressions. Four contained a single character ("∆", an emoji) and one
  * contained an inline <svg>. The distinction is preserved as a `kind` rather
  * than flattened, because a glyph is content (it can be swapped by editing
  * JSON) while the SVG is a component that must inherit `currentColor` to

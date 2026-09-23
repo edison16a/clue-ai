@@ -14,7 +14,7 @@ import type { ExtractRequest, HelpRequest, LocateRequest } from "@/lib/types";
  * Prompt assembly is the part of this app most worth reading and most likely
  * to be changed, and it was previously buried between `await req.json()` and
  * `new Response(...)` in each route. Isolating it means the interesting logic
- * can be read — and tested — without standing up a request.
+ * can be read and tested without standing up a request.
  */
 
 /** How many characters of submitted work reach the prompt. */
@@ -48,13 +48,13 @@ function imageParts(images: ReadonlyArray<{ src?: string }> | undefined): Conten
   return (images ?? [])
     .filter((image): image is { src: string } => Boolean(image?.src))
     // `detail` is required by the SDK's type. The original built this array
-    // as `any[]` and omitted the field, which the API resolves to "auto" —
+    // as `any[]` and omitted the field, which the API resolves to "auto",
     // so stating it explicitly sends the identical request.
     .map((image) => ({ type: "input_image", image_url: image.src, detail: "auto" }));
 }
 
 /**
- * Coaching hints for a submission. Never returns a solution — that constraint
+ * Coaching hints for a submission. Never returns a solution. That constraint
  * lives in data/prompts/help.md, not here.
  */
 export async function requestHelp(body: HelpRequest): Promise<string> {
@@ -139,7 +139,7 @@ export interface ExtractResult {
 
 /**
  * Transcribes code out of uploaded screenshots, preserving the student's
- * mistakes — correcting them here would hand back an answer.
+ * mistakes. Correcting them here would hand back an answer.
  */
 export async function requestExtract(body: ExtractRequest): Promise<ExtractResult> {
   const userText = [
