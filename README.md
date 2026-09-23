@@ -64,27 +64,29 @@ data/                      Content and config. No code.
   uploads.json               Accepted file extensions
   config.json                Models, limits, storage keys, defaults
   theme.json                 Colours for dark and light
-  prompts/                   The AI prompts, as Markdown
-    help.md  locate.md  extract.md
+  prompts/
+    help.md  locate.md  extract.md              System prompts
+    help.user.md  locate.user.md  extract.user.md   User-turn templates
+    fragments.json                              Pieces filled into the templates
 
-lib/                       Logic. No JSX, no fetch.
-  subjects.ts                The subject registry
-  locator.ts                 Parses the locator reply into line ranges
-  numbering.ts               Renders a submission as a numbered listing
-  fences.ts                  Strips Markdown fences from transcribed code
-  uploads.ts                 Accept attribute and text-file detection
-  history.ts, storage.ts     History records and guarded localStorage
-  types.ts                   Shared types and API contracts
-  hooks/                     useTheme, useHistory
-  server/                    OpenAI client, prompt loader, the three
-                             model calls, response helpers
+lib/                       Logic. No JSX.
+  subjects.ts, locator.ts, numbering.ts, fences.ts, uploads.ts, history.ts
+                             Pure rules, each tested on its own
+  storage.ts                 Guarded localStorage access
+  api-client.ts              The browser's calls to the three routes
+  hooks/                     useTheme, useHistory, useAttachments,
+                             useLineHints, useGuidance
+  server/
+    ai/                      One module per endpoint: builds the prompt, calls the model
+    templates.ts, prompts.ts Load the files in data/prompts/
+    openai.ts, http.ts, route.ts   Client, JSON replies, shared route wrapper
 
 app/
   page.tsx, layout.tsx       Route entry and document shell
-  globals.css                Stylesheet entry
+  components/                ClueWorkspace composes header/, editor/,
+                             response/, history/ and shared/
   styles/                    Per-feature stylesheets, colours from tokens only
-  components/                UI, one file per piece of the screen
-  api/help, api/locate, api/extract    Thin HTTP adapters
+  api/help, api/locate, api/extract    Thin routes on top of lib/server/route.ts
 
 scripts/                   Extraction and validation tooling
 tests/                     Vitest suites
@@ -148,6 +150,8 @@ Edit `data/strings.json`. Leave `{action}`, `{subject}` and `{count}` in place, 
 
 Edit the Markdown in `data/prompts/`. These are read from disk at runtime, so there is no code change involved.
 
+Each endpoint has two files. `help.md` is the system prompt, the rules the model follows. `help.user.md` is the message wrapped around the student's input, with slots like `{ask}`, `{subject}` and `{code}` that get filled in. Keep the slots; `npm run validate:data` fails if one goes missing. A line that holds only a slot disappears when its value is empty, which is how the extract prompt leaves out its subject line.
+
 Be careful with `locate.md`. Its `LINES:` and `- start-end | reason` and `NOTE:` format is what `lib/locator.ts` parses. A test checks the format is still documented there.
 
 ### Accept another file type
@@ -170,7 +174,7 @@ Edit `data/config.json`. It holds the model and retention flag per endpoint, the
 
 ## 🧰 Scripts
 
-`validate-data.mjs` runs 27 checks over `data/`, including round-trips against the original source and a check that no stylesheet names a colour directly. `generate-tokens.mjs` turns `data/theme.json` into CSS. The `extract-*.mjs` scripts are the one-shot tools that pulled the data out of the source in the first place, kept because the validator re-runs them.
+`validate-data.mjs` runs 31 checks over `data/`, including round-trips against the original source and a check that no stylesheet names a colour directly. `generate-tokens.mjs` turns `data/theme.json` into CSS. The `extract-*.mjs` scripts are the one-shot tools that pulled the data out of the source in the first place, kept because the validator re-runs them.
 
 ---
 
