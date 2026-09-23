@@ -31,20 +31,18 @@ function jsonResponse<T>(body: T, status: number): Response {
 /**
  * Extracts a message from an unknown thrown value.
  *
- * Replaces the routes' `catch (err: any)` with a typed equivalent. The
- * behaviour is deliberately identical to the original `err?.message ?? fallback`,
- * including its quirks: a thrown string loses its text (strings have no
- * `.message`), and an empty-string message is returned as-is because `??` only
- * falls back on null/undefined. Both are preserved so this stays a pure move;
- * improving them is a separate change.
+ * Handles the two shapes a route can realistically catch: an Error (or any
+ * object with a string `message`, which is what the OpenAI SDK rejects
+ * with), and a bare thrown string.
  *
- * One pathological input differs. `{ message: 42 }` used to be serialised
- * straight into the reply as `{"error": 42}`, because `any` let a number
- * escape through a field the client reads as a string. Returning the fallback
- * instead is the only divergence, and honouring it would mean typing the error
- * field as `unknown` to preserve a shape no real error has.
+ * The string case is the fix. This used to reproduce the original
+ * `err?.message ?? fallback`, and a string has no `.message`, so a
+ * `throw "quota exceeded"` from a dependency reached the student as
+ * "Unknown error" with the actual reason thrown away. An empty-string
+ * message still passes through unchanged, as before.
  */
 export function messageFromError(error: unknown, fallback: string): string {
+  if (typeof error === "string" && error) return error;
   const message =
     error !== null && error !== undefined
       ? (error as { message?: unknown }).message

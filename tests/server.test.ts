@@ -78,9 +78,13 @@ describe("messageFromError", () => {
     expect(messageFromError(null, "fallback")).toBe("fallback");
     expect(messageFromError(undefined, "fallback")).toBe("fallback");
     expect(messageFromError({}, "fallback")).toBe("fallback");
-    // A thrown string has no `.message`; this reproduces the original
-    // `err?.message ?? fallback` rather than improving on it.
-    expect(messageFromError("boom", "fallback")).toBe("fallback");
+    expect(messageFromError("", "fallback")).toBe("fallback");
+  });
+
+  it("keeps the text of a thrown string", () => {
+    // Regression: this used to return the fallback, because a string has no
+    // `.message`, and the student saw "Unknown error" instead of the reason.
+    expect(messageFromError("quota exceeded", "fallback")).toBe("quota exceeded");
   });
 
   it("passes an empty message through rather than falling back", () => {
