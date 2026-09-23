@@ -4,9 +4,9 @@ import { describe, expect, it, vi } from "vitest";
 
 import strings from "@/data/strings.json";
 import { SUBJECTS, getSubject } from "@/lib/subjects";
-import { SubjectModeBar } from "@/app/components/SubjectModeBar";
-import { LineHintOverlay } from "@/app/components/LineHintOverlay";
-import { HistorySection } from "@/app/components/HistorySection";
+import { SubjectModeBar } from "@/app/components/header/SubjectModeBar";
+import { LineHintOverlay } from "@/app/components/editor/LineHintOverlay";
+import { HistorySection } from "@/app/components/history/HistorySection";
 import type { HistoryItem } from "@/lib/types";
 
 describe("SubjectModeBar", () => {

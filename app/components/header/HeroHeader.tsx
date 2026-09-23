@@ -2,8 +2,8 @@
 
 import strings from "@/data/strings.json";
 import type { Subject, SubjectId, ThemeMode } from "@/lib/types";
-import { SubjectModeBar } from "@/app/components/SubjectModeBar";
-import { MoonIcon, SaveOffIcon, SaveOnIcon, SunIcon } from "@/app/components/Icons";
+import { SubjectModeBar } from "@/app/components/header/SubjectModeBar";
+import { MoonIcon, SaveOffIcon, SaveOnIcon, SunIcon } from "@/app/components/shared/Icons";
 
 interface HeroHeaderProps {
   theme: ThemeMode;

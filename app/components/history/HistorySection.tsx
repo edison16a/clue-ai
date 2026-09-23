@@ -4,8 +4,8 @@ import configData from "@/data/config.json";
 import strings from "@/data/strings.json";
 import { getSubject } from "@/lib/subjects";
 import type { HistoryItem } from "@/lib/types";
-import { CloseIcon } from "@/app/components/Icons";
-import { Markdown } from "@/app/components/Markdown";
+import { CloseIcon } from "@/app/components/shared/Icons";
+import { Markdown } from "@/app/components/shared/Markdown";
 
 interface HistorySectionProps {
   history: readonly HistoryItem[];

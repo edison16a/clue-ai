@@ -3,7 +3,7 @@
 import strings from "@/data/strings.json";
 import { emphasisForLine, isMeaningfulNote } from "@/lib/locator";
 import type { LineHint } from "@/lib/types";
-import { LoadingBar } from "@/app/components/LoadingBar";
+import { LoadingBar } from "@/app/components/shared/LoadingBar";
 
 interface LineHintOverlayProps {
   /** The submission, already split into lines. */

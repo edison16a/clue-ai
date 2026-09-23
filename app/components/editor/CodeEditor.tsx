@@ -2,7 +2,7 @@
 
 import strings from "@/data/strings.json";
 import type { LineHint, Subject } from "@/lib/types";
-import { LineHintOverlay } from "@/app/components/LineHintOverlay";
+import { LineHintOverlay } from "@/app/components/editor/LineHintOverlay";
 
 interface CodeEditorProps {
   subject: Subject;

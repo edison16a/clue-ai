@@ -4,7 +4,7 @@ import type { ComponentType } from "react";
 
 import strings from "@/data/strings.json";
 import type { Subject, SubjectId } from "@/lib/types";
-import { CodeIcon } from "@/app/components/Icons";
+import { CodeIcon } from "@/app/components/shared/Icons";
 
 /**
  * Icon components a subject can name via `icon.kind === "component"`.

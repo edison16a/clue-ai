@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import strings from "@/data/strings.json";
 import { getSubject } from "@/lib/subjects";
-import { ResponsePanel } from "@/app/components/ResponsePanel";
+import { ResponsePanel } from "@/app/components/response/ResponsePanel";
 
 describe("ResponsePanel", () => {
   const subject = getSubject("math");

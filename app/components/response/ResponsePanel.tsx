@@ -2,8 +2,8 @@
 
 import strings from "@/data/strings.json";
 import type { Subject } from "@/lib/types";
-import { LoadingBar } from "@/app/components/LoadingBar";
-import { Markdown } from "@/app/components/Markdown";
+import { LoadingBar } from "@/app/components/shared/LoadingBar";
+import { Markdown } from "@/app/components/shared/Markdown";
 
 interface ResponsePanelProps {
   subject: Subject;

@@ -4,7 +4,7 @@ import { useRef } from "react";
 import strings from "@/data/strings.json";
 import { FILE_ACCEPT_ATTRIBUTE } from "@/lib/uploads";
 import type { ImageAttachment, Subject } from "@/lib/types";
-import { CloseIcon, SearchIcon, UploadIcon } from "@/app/components/Icons";
+import { CloseIcon, SearchIcon, UploadIcon } from "@/app/components/shared/Icons";
 
 interface UploadRowProps {
   subject: Subject;

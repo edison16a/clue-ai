@@ -10,11 +10,11 @@ import { splitLines } from "@/lib/numbering";
 import { DEFAULT_SUBJECT, SUBJECTS, getSubject } from "@/lib/subjects";
 import { isImageFile, isTextLikeFile } from "@/lib/uploads";
 import type { ImageAttachment, LineHint, SubjectId } from "@/lib/types";
-import { CodeEditor } from "@/app/components/CodeEditor";
-import { HeroHeader } from "@/app/components/HeroHeader";
-import { HistorySection } from "@/app/components/HistorySection";
-import { ResponsePanel } from "@/app/components/ResponsePanel";
-import { UploadRow } from "@/app/components/UploadRow";
+import { CodeEditor } from "@/app/components/editor/CodeEditor";
+import { HeroHeader } from "@/app/components/header/HeroHeader";
+import { HistorySection } from "@/app/components/history/HistorySection";
+import { ResponsePanel } from "@/app/components/response/ResponsePanel";
+import { UploadRow } from "@/app/components/editor/UploadRow";
 
 /**
  * The application container: all interaction state, and the two request
