@@ -1,0 +1,7 @@
+{
+  "$comment": "Pieces substituted into the *.user.md templates. `{value}` is replaced with the student's input. These reach the model verbatim, so edit them the way you would edit a prompt.",
+  "askPresent": "• {value}",
+  "askMissing": "• (no extra description provided)",
+  "codeMissing": "(none provided)",
+  "extractSubject": "Subject: {value}"
+}

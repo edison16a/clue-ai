@@ -356,6 +356,42 @@ check("the locate prompt still documents the format the parser expects", () => {
   );
 });
 
+// ------------------------------------------------------- user-turn templates
+
+console.log("\ndata/prompts/*.user.md and fragments.json");
+
+/**
+ * The services fill these slots by name. A template that loses one would
+ * silently send the model a prompt without the student's code in it, which
+ * produces confident, useless guidance rather than an error.
+ */
+const REQUIRED_SLOTS = {
+  "help.user": ["ask", "subject", "code"],
+  "locate.user": ["ask", "subject", "code"],
+  "extract.user": ["ask", "subject"],
+};
+
+for (const [name, slots] of Object.entries(REQUIRED_SLOTS)) {
+  check(`${name}.md has the slots its service fills`, () => {
+    const text = readFileSync(new URL(`../data/prompts/${name}.md`, import.meta.url), "utf8");
+    for (const slot of slots) {
+      assert(text.includes(`{${slot}}`), `${name}.md is missing {${slot}}`);
+    }
+    const unknown = [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).filter((k) => !slots.includes(k));
+    assert(unknown.length === 0, `${name}.md has slots nothing fills: ${unknown.join(", ")}`);
+  });
+}
+
+check("fragments.json has every fragment the services use", () => {
+  const fragments = readData("prompts/fragments.json");
+  for (const key of ["askPresent", "askMissing", "codeMissing", "extractSubject"]) {
+    assert(typeof fragments[key] === "string" && fragments[key].length > 0, `fragment "${key}" is missing`);
+  }
+  for (const key of ["askPresent", "extractSubject"]) {
+    assert(fragments[key].includes("{value}"), `fragment "${key}" must contain {value}`);
+  }
+});
+
 // ------------------------------------------------------------------- theme
 
 console.log("\ndata/theme.json");
