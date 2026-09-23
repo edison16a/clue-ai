@@ -32,12 +32,13 @@ export function useGuidance(inputs: GuidanceInputs) {
    */
   const requestGuidance = async () => {
     const { code, setCode, ask, subjectId, images, recordInteraction, locateLines } = inputs;
+    // Declared outside the try so the failure branch sees extracted text too.
+    let workingCode = code;
     try {
       setAiText("");
       setIsLoading(true);
 
       const needsExtraction = images.length > 0 && (!code || code.trim() === "");
-      let workingCode = code;
 
       if (needsExtraction) {
         workingCode = await fetchExtraction({ images: [...images], ask, subjectMode: subjectId });
@@ -61,8 +62,11 @@ export function useGuidance(inputs: GuidanceInputs) {
       setAiText(message);
 
       // Failures are recorded too, so a student can see what happened rather
-      // than losing the attempt entirely.
-      recordInteraction({ mode: subjectId, ask, code, images, aiText: message });
+      // than losing the attempt entirely. This used to record `code`, the
+      // value from before extraction, so when a screenshot was transcribed
+      // and then the help call failed, the history entry showed nothing
+      // submitted even though the code box now held the transcribed text.
+      recordInteraction({ mode: subjectId, ask, code: workingCode, images, aiText: message });
     } finally {
       setIsLoading(false);
     }
