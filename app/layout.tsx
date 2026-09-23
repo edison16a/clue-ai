@@ -1,12 +1,12 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { ReactNode } from "react";
+import strings from "@/data/strings.json";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Clue-ai",
-  description:
-    "An AI Agent that helps students fix code and figure out labs without directly giving the answer.",
+  title: strings.meta.title,
+  description: strings.meta.description,
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

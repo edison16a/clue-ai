@@ -86,7 +86,7 @@ export function SubjectModeBar({
           aria-pressed={showMore}
         >
           <span className="modeIcon" aria-hidden="true">
-            +
+            {strings.subjectBar.showMoreGlyph}
           </span>
           <span className="modeLabelText">{strings.subjectBar.showMore}</span>
         </button>
@@ -98,7 +98,7 @@ export function SubjectModeBar({
           aria-pressed={!showMore}
         >
           <span className="modeIcon" aria-hidden="true">
-            –
+            {strings.subjectBar.showLessGlyph}
           </span>
           <span className="modeLabelText">{strings.subjectBar.showLess}</span>
         </button>

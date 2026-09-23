@@ -92,7 +92,7 @@ export function UploadRow({
                 title={strings.upload.removeTitle}
                 onClick={() => onRemoveImage(index)}
               >
-                ×
+                {strings.upload.removeGlyph}
               </button>
             </div>
           ))}
