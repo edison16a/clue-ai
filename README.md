@@ -1,6 +1,6 @@
 # Clue.ai 🎓💡
 
-**Project Discontinued:**
+**API Currently Down**
 [https://clue-ai.vercel.app/](https://clue-ai.vercel.app/)
 
 Clue.ai is an AI learning assistant that helps students troubleshoot assignments **without spoiling the answer**.
