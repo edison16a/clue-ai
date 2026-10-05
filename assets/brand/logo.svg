@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72" role="img" aria-labelledby="title">
+  <title id="title">Clue.ai</title>
+  <rect width="72" height="72" rx="18" fill="#7c3aed"/>
+  <circle cx="32" cy="31" r="14" fill="none" stroke="#ffffff" stroke-width="5"/>
+  <path d="M42.5 41.5 L53 52" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  <path d="M32 23.5 L33.9 29.1 L39.5 31 L33.9 32.9 L32 38.5 L30.1 32.9 L24.5 31 L30.1 29.1 Z" fill="#ffffff"/>
+</svg>
