@@ -1,13 +1,46 @@
-# Clue.ai 🎓💡
+<p align="center">
+  <img src="assets/brand/logo.svg" width="72" height="72" alt="Clue.ai logo">
+</p>
 
-**API Currently Down**
-[https://clue-ai.vercel.app/](https://clue-ai.vercel.app/)
+<h1 align="center">Clue.ai</h1>
 
-Clue.ai is an AI learning assistant that helps students troubleshoot assignments **without spoiling the answer**.
+<p align="center">
+  An AI learning assistant that helps students troubleshoot assignments without spoiling the answer.<br>
+  <a href="https://clue-ai.vercel.app/">clue-ai.vercel.app</a> <strong>(API currently down)</strong>
+</p>
 
-It works like a teacher who nudges you in the right direction and asks good questions instead of handing over a solution, so you actually learn the reasoning.
+<p align="center">
+  <img src="https://img.shields.io/github/license/edison16a/clue-ai?color=7c3aed" alt="License">
+  <img src="https://img.shields.io/badge/node-18.18%2B-7c3aed?logo=nodedotjs&logoColor=white" alt="Node.js 18.18 or newer">
+  <img src="https://img.shields.io/badge/platforms-desktop%20%26%20mobile%20web-7c3aed" alt="Platforms: desktop and mobile web">
+</p>
+
+## 🚀 Screenshots
+
+<img src="https://github.com/user-attachments/assets/cf56f87b-4052-4e0c-baed-07e39484a3f7" width="100%" alt="Clue.ai giving guidance on a student's code">
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/desktop-dark.png" width="100%" alt="Dark mode with the likely error lines highlighted"></td>
+    <td width="50%"><img src="assets/screenshots/desktop-light.png" width="100%" alt="Light mode with the likely error lines highlighted"></td>
+  </tr>
+  <tr>
+    <td align="center">Dark mode</td>
+    <td align="center">Light mode</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/screenshots/mobile-dark.png" width="240" alt="Clue.ai on a phone in dark mode"></td>
+    <td align="center"><img src="assets/screenshots/mobile-light.png" width="240" alt="Clue.ai on a phone in light mode"></td>
+  </tr>
+  <tr>
+    <td align="center">Phone, dark</td>
+    <td align="center">Phone, light</td>
+  </tr>
+</table>
 
 ---
+
+It works like a teacher who nudges you in the right direction and asks good questions instead of handing over a solution, so you actually learn the reasoning.
 
 ## ✨ What it does
 
@@ -15,12 +48,6 @@ It works like a teacher who nudges you in the right direction and asks good ques
 * 🖼️ **Upload images and screenshots.** Questions, diagrams, lab prompts. You can also drop source files straight into the text box.
 * 💬 **Describe your problem.** Tell Clue.ai what confuses you, or just say "help debug".
 * 🤖 **Get coaching, not answers.** You get hints, the lines worth checking, and clarifying questions.
-
----
-
-## 🚀 Screenshots
-
-<img width="1103" height="851" alt="image" src="https://github.com/user-attachments/assets/cf56f87b-4052-4e0c-baed-07e39484a3f7" />
 
 ---
 
@@ -88,6 +115,7 @@ app/
   styles/                    Per-feature stylesheets, colours from tokens only
   api/help, api/locate, api/extract    Thin routes on top of lib/server/route.ts
 
+assets/                    Logo (brand/) and README screenshots (screenshots/)
 scripts/                   Extraction and validation tooling
 tests/                     Vitest suites
 ```
