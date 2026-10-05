@@ -19,25 +19,6 @@
 
 <img src="https://github.com/user-attachments/assets/cf56f87b-4052-4e0c-baed-07e39484a3f7" width="100%" alt="Clue.ai giving guidance on a student's code">
 
-<table>
-  <tr>
-    <td width="50%"><img src="assets/screenshots/desktop-dark.png" width="100%" alt="Dark mode with the likely error lines highlighted"></td>
-    <td width="50%"><img src="assets/screenshots/desktop-light.png" width="100%" alt="Light mode with the likely error lines highlighted"></td>
-  </tr>
-  <tr>
-    <td align="center">Dark mode</td>
-    <td align="center">Light mode</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="assets/screenshots/mobile-dark.png" width="240" alt="Clue.ai on a phone in dark mode"></td>
-    <td align="center"><img src="assets/screenshots/mobile-light.png" width="240" alt="Clue.ai on a phone in light mode"></td>
-  </tr>
-  <tr>
-    <td align="center">Phone, dark</td>
-    <td align="center">Phone, light</td>
-  </tr>
-</table>
-
 ---
 
 It works like a teacher who nudges you in the right direction and asks good questions instead of handing over a solution, so you actually learn the reasoning.
@@ -115,7 +96,7 @@ app/
   styles/                    Per-feature stylesheets, colours from tokens only
   api/help, api/locate, api/extract    Thin routes on top of lib/server/route.ts
 
-assets/                    Logo (brand/) and README screenshots (screenshots/)
+assets/brand/              Project logo
 scripts/                   Extraction and validation tooling
 tests/                     Vitest suites
 ```
